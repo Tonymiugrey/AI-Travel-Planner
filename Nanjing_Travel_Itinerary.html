@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>南京两日休闲游</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f4f4; /* Lighter grey for a softer look */
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header-banner {
+            background-color: #2c3e50; /* Deep blue-gray */
+            color: #ffffff;
+            padding: 50px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 5px solid #e74c3c; /* Red accent */
+        }
+        .header-banner h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        .section-title { /* For Core Tips, Remarks */
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e74c3c;
+        }
+        .day-section {
+            background-color: #ffffff;
+            margin-bottom: 40px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            border-left: 6px solid #e74c3c; /* Red accent */
+        }
+        .day-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50; /* Deep blue-gray */
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db; /* Blue accent for day titles */
+            text-transform: uppercase;
+        }
+        .event-block {
+            margin-bottom: 30px;
+            padding-left: 25px;
+            border-left: 4px solid #3498db; /* Blue accent for events */
+            position: relative;
+        }
+        .event-block::before { /* Dot on the border */
+            content: '';
+            position: absolute;
+            left: -10px; /* Adjust to align with the border */
+            top: 5px;
+            height: 16px;
+            width: 16px;
+            background-color: #3498db;
+            border-radius: 50%;
+            border: 3px solid #fff;
+        }
+        .event-time {
+            font-weight: bold;
+            color: #e74c3c; /* Reddish color for time */
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        .event-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .event-details p, .event-details ul {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .event-details ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .event-details ul li {
+            position: relative;
+            padding-left: 30px; /* Space for custom bullet */
+            margin-bottom: 6px;
+        }
+        .event-details ul li::before {
+            content: '\\f0da'; /* Font Awesome chevron-right */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 5px;
+            color: #3498db; /* Blue accent for bullets */
+            font-size: 0.9em;
+        }
+        .gaode-link, .xiaohongshu-link {
+            color: #3498db; /* Consistent link color */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .gaode-link:hover, .xiaohongshu-link:hover {
+            color: #e74c3c; /* Red hover for links */
+            text-decoration: underline;
+        }
+        .gaode-link i, .xiaohongshu-link i {
+            margin-right: 5px;
+        }
+        .core-tips, .remarks-section {
+            background-color: #eaf2f8; /* Light blueish grey */
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+        }
+        .core-tips p, .remarks-section p {
+            margin-bottom: 8px;
+        }
+        .map-placeholder {
+            background-color: #e0e0e0;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border: 2px dashed #bbb;
+            border-radius: 5px;
+            text-align: center;
+        }
+        /* Utility for icons */
+        .icon {
+            margin-right: 8px;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-banner">
+        <h1 id="main-title">南京两日休闲游</h1>
+    </header>
+
+    <div class="container">
+        <div id="core-tips-container" class="core-tips">
+            <!-- Core tips will be loaded here -->
+        </div>
+
+        <div id="itinerary-content">
+            <!-- Itinerary will be loaded here -->
+        </div>
+
+        <div id="remarks-container" class="remarks-section">
+            <!-- Remarks will be loaded here -->
+        </div>
+
+        <div class="gaode-api-info mt-10 p-6 bg-gray-200 border border-gray-400 rounded-lg">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-3"><i class="fas fa-map-marked-alt icon"></i>高德地图每日路线预览</h3>
+            <p class="text-gray-600">此行程计划中的地点已包含高德地图链接。如需实现更高级的“每日路线动态预览”功能，您需要：</p>
+            <ol class="list-decimal list-inside text-gray-600 mt-3 space-y-1">
+                <li>注册高德地图开放平台开发者账号并创建应用，获取API Key。</li>
+                <li>在HTML中引入高德地图JS API。</li>
+                <li>编写JavaScript代码，收集每日的地点坐标，使用高德地图路径规划服务进行展示。</li>
+            </ol>
+            <p class="mt-3 text-sm text-gray-500">这部分高级功能需要您自行开发或进一步定制。</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadItinerary() {
+            try {
+                const response = await fetch('Nanjing_Travel_Plan_Final.md?t=' + new Date().getTime()); // Cache buster
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const markdown = await response.text();
+                renderMarkdown(markdown);
+            } catch (error) {
+                console.error('Error loading Markdown:', error);
+                document.getElementById('itinerary-content').innerHTML = '<p class="text-red-600 font-semibold text-center py-10">无法加载行程内容。请确保 Nanjing_Travel_Plan_Final.md 文件与此HTML文件在同一目录下，并且网络连接正常。</p>';
+            }
+        }
+
+        function renderMarkdown(markdown) {
+            const lines = markdown.split('\\n');
+            const itineraryContent = document.getElementById('itinerary-content');
+            const coreTipsContainer = document.getElementById('core-tips-container');
+            const remarksContainer = document.getElementById('remarks-container');
+            
+            itineraryContent.innerHTML = ''; 
+            coreTipsContainer.innerHTML = '<h3 class="section-title">核心提示</h3>';
+            remarksContainer.innerHTML = '<h3 class="section-title">备注</h3>';
+
+            let currentDayDiv = null;
+            let currentEventBlock = null;
+            let currentDetailList = null; 
+            let parsingState = 'start'; 
+
+            lines.forEach(line => {
+                const originalLine = line;
+                line = line.trim();
+
+                if (line.startsWith('<!--') && line.endsWith('-->')) return;
+
+                if (line.startsWith('# ')) {
+                    document.getElementById('main-title').textContent = line.substring(2).trim();
+                    return;
+                }
+
+                if (line.toLowerCase().startsWith('**核心提示:**')) {
+                    parsingState = 'core-tips';
+                    return;
+                } else if (line.startsWith('### **Day 1:')) {
+                    parsingState = 'day1';
+                    currentDayDiv = createDaySection(line.substring(line.indexOf('Day 1:')).trim(), 'day-1-content');
+                    itineraryContent.appendChild(currentDayDiv);
+                    currentEventBlock = null;
+                    return;
+                } else if (line.startsWith('### **Day 2:')) {
+                    parsingState = 'day2';
+                    currentDayDiv = createDaySection(line.substring(line.indexOf('Day 2:')).trim(), 'day-2-content');
+                    itineraryContent.appendChild(currentDayDiv);
+                    currentEventBlock = null;
+                    return;
+                } else if (line.startsWith('## 备注')) {
+                    parsingState = 'remarks';
+                    return;
+                } else if (line === '---' && parsingState === 'core-tips') {
+                    parsingState = 'day-start'; // Transition state
+                    return;
+                }
+
+                switch (parsingState) {
+                    case 'core-tips':
+                        if (line.startsWith('*')) {
+                             const tipItem = document.createElement('p');
+                             tipItem.innerHTML = '<i class="fas fa-lightbulb icon"></i>' + parseInlineFormatting(line.substring(1).trim());
+                             coreTipsContainer.appendChild(tipItem);
+                        }
+                        break;
+                    case 'remarks':
+                         if (line.startsWith('-')) {
+                             const remarkItem = document.createElement('p');
+                             remarkItem.innerHTML = '<i class="fas fa-info-circle icon"></i>' + parseInlineFormatting(line.substring(1).trim());
+                             remarksContainer.appendChild(remarkItem);
+                        }
+                        break;
+                    case 'day1':
+                    case 'day2':
+                        if (!currentDayDiv) break;
+
+                        if (originalLine.startsWith('*   **') && originalLine.includes(':**')) { // Main event title
+                            currentEventBlock = document.createElement('div');
+                            currentEventBlock.className = 'event-block';
+                            currentDetailList = null; // Reset for new event
+
+                            const timeAndTitle = originalLine.substring(originalLine.indexOf('**') + 2).trim();
+                            const timeMatch = timeAndTitle.match(/^(.*?):\\*\\*/);
+                            
+                            if (timeMatch && timeMatch[1]) {
+                                const timeEl = document.createElement('p');
+                                timeEl.className = 'event-time';
+                                timeEl.innerHTML = `<i class="far fa-clock icon"></i>${timeMatch[1].trim()}`;
+                                currentEventBlock.appendChild(timeEl);
+                                
+                                const titleText = timeAndTitle.substring(timeMatch[0].length).trim();
+                                const titleEl = document.createElement('h4');
+                                titleEl.className = 'event-title';
+                                titleEl.innerHTML = `<i class="fas fa-map-marker-alt icon"></i>${parseInlineFormatting(titleText)}`;
+                                currentEventBlock.appendChild(titleEl);
+                            } else { // Fallback if time parsing is tricky
+                                const titleEl = document.createElement('h4');
+                                titleEl.className = 'event-title';
+                                titleEl.innerHTML = `<i class="fas fa-map-marker-alt icon"></i>${parseInlineFormatting(timeAndTitle.replace(/\\*\\*/g,''))}`;
+                                currentEventBlock.appendChild(titleEl);
+                            }
+                            currentDayDiv.appendChild(currentEventBlock);
+
+                        } else if (originalLine.match(/^\\s{4}\\*\\s{3}/) && currentEventBlock) { // Sub-items (4 spaces, *, 3 spaces)
+                            if (!currentDetailList) {
+                                currentDetailList = document.createElement('ul');
+                                currentDetailList.className = 'event-details';
+                                currentEventBlock.appendChild(currentDetailList);
+                            }
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = parseInlineFormatting(originalLine.trim().substring(1).trim()); // Remove leading '*'
+                            currentDetailList.appendChild(listItem);
+
+                        } else if (originalLine.match(/^\\s{8}\\*\\s{3}/) && currentDetailList) { // Deeper nested items (8 spaces, *, 3 spaces)
+                             const lastLi = currentDetailList.lastElementChild;
+                             if (lastLi) {
+                                let subList = lastLi.querySelector('ul.sub-list');
+                                if (!subList) {
+                                    subList = document.createElement('ul');
+                                    subList.className = 'sub-list event-details ml-4'; // Indent sub-list
+                                    lastLi.appendChild(subList);
+                                }
+                                const subListItem = document.createElement('li');
+                                subListItem.innerHTML = parseInlineFormatting(originalLine.trim().substring(1).trim());
+                                subList.appendChild(subListItem);
+                            }
+                        } else if (line !== '' && currentEventBlock && !originalLine.startsWith('*') && !originalLine.startsWith('-')) { // General text under an event
+                            const p = document.createElement('p');
+                            p.className = 'event-details';
+                            p.innerHTML = parseInlineFormatting(line);
+                            currentEventBlock.appendChild(p);
+                        }
+                        break;
+                }
+            });
+        }
+
+        function createDaySection(title, id) {
+            const section = document.createElement('div');
+            section.id = id;
+            section.className = 'day-section';
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'day-title';
+            titleEl.textContent = title;
+            section.appendChild(titleEl);
+            return section;
+        }
+
+        function parseInlineFormatting(text) {
+            // Gaode links: [Text](URL)
+            text = text.replace(/\\[(.*?)\\]\\((https?:\/\/www\\.amap\\.com[^\\])]*?)\\)/g, (match, linkText, url) => {
+                return `<a href="${url}" target="_blank" class="gaode-link"><i class="fas fa-map-signs"></i>${linkText}</a>`;
+            });
+
+            // Xiaohongshu links: `URL` (text) or `URL`
+            text = text.replace(/`(https?:\/\/www\\.xiaohongshu\\.com[^\`]*?)`\\s*(\\((.*?)\\))?/g, (match, url, noteGroup, noteText) => {
+                let displayNote = noteText ? ` (${noteText.trim()})` : ' (小红书参考)';
+                if (url.includes(noteText) && noteText) displayNote = ''; 
+                 return `<a href="${url}" target="_blank" class="xiaohongshu-link"><i class="fab fa-xing"></i>${url.length > 50 ? '链接' : url}${displayNote}</a>`;
+            });
+            text = text.replace(/《(.*?)》:\\s*`(https?:\/\/www\\.xiaohongshu\\.com[^\`]*?)`/g, (match, title, url) => {
+                return `<a href="${url}" target="_blank" class="xiaohongshu-link"><i class="fab fa-xing"></i>《${title}》</a>`;
+            });
+
+            text = text.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>');
+            text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+            text = text.replace(/\\*(.*?)\\*/g, '<em>$1</em>');
+            // text = text.replace(/_(.*?)_/g, '<em>$1</em>'); // Avoid conflict
+            text = text.replace(/~~(.*?)~~/g, '<del>$1</del>');
+            
+            // Handle simple `code` tags if not XHS links
+            text = text.replace(/`([^`]+?)`/g, (match, content) => {
+                if (content.startsWith('http')) return match; // Already handled by XHS
+                return `<code>${content}</code>`;
+            });
+
+            return text;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadItinerary);
+    </script>
+</body>
+</html>
