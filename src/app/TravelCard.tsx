@@ -182,8 +182,6 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                         //bg="$blue8"
                         //color="white"
                         onPress={handleNavigate}
-                        animation={'bouncy'}
-                        pressStyle={{ scale: 0.95 }}
                         fontWeight={600}
                         >
                         导航
@@ -197,8 +195,6 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                         //color="white"
                         icon={Info}
                         onPress={() => setSheetOpen(true)}
-                        animation={'bouncy'}
-                        pressStyle={{ scale: 0.95 }}
                         fontWeight={600}
                         >
                         详细行程
