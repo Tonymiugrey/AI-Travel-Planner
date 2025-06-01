@@ -320,8 +320,6 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
               bg="$color5"
               mb="$6"
               onPress={() => setSheetOpen(false)}
-              pressStyle={{ scale: 0.95 }}
-              animation={'bouncy'}
             >
               关闭
             </Button>
