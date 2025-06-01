@@ -211,7 +211,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
           backgroundColor="$shadow6"
           enterStyle={{ opacity: 0 }}
           exitStyle={{ opacity: 0 }}/>
-        <Sheet.Handle bg='$color5' opacity='0.6' mb='$3'/>
+        <Sheet.Handle bg='$color5' backdrop-blur-lg opacity='0.6' mb='$3'/>
         <Sheet.Frame 
           p="$4" 
           gap="$4" 
