@@ -47,6 +47,7 @@
     "style-loader": "^3.3.4",
     "tamagui-loader": "^1.126.13",
     "thread-loader": "^4.0.2",
+    "typescript": "^5.8.3",
     "url-loader": "^4.1.1",
     "vite": "^6.0.6",
     "webpack": "^5.91.0",
