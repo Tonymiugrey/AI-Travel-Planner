@@ -1,7 +1,7 @@
 {
-  "name": "南京之旅 - AI Travel Planner",
+  "name": "南京之旅",
   "short_name": "南京之旅",
-  "description": "智能南京旅行规划助手",
+  "description": "南京旅行规划",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
