@@ -206,7 +206,12 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
 
       {/* Sheet Modal */}
       <Sheet modal={true} open={sheetOpen} onOpenChange={setSheetOpen} dismissOnSnapToBottom snapPointsMode="percent" snapPoints={[90]}>
-        <Sheet.Overlay bg="$shadow6"/>
+        <Sheet.Overlay         
+          animation="lazy"
+          backgroundColor="$shadow6"
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}/>
+        <Sheet.Handle/>
         <Sheet.Frame 
           p="$4" 
           gap="$4" 
@@ -214,7 +219,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
           borderTopLeftRadius="$6"
           borderTopRightRadius="$6"
         >
-        <Sheet.Handle backgroundColor="$shadow3"/>
+        <Sheet.Handle/>
 
         <YStack gap="$4" flex={1}>
             <H3 color="$color12">{data.title}</H3>
