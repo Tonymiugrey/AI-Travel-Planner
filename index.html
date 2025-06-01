@@ -1,390 +1,75 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>南京两日游 - 行程计划</title>
-    <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://webapi.amap.com/maps?v=2.0&key=6aee4ea7c3fafff7b2778f3b8d159fd7"></script> 
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="南京之旅" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192x192.png" />
+    <title>南京之旅 - AI Travel Planner</title>
     <style>
-        :root {
-            --primary-color: #C0392B; /* Adjust as per Constructivism palette */
-            --secondary-color: #2C3E50; /* Adjust as per Constructivism palette */
-            --background-color: #FDFEFE;
-            --text-color: #17202A;
-            --card-background: #FFFFFF;
-            --font-serif: 'Noto Serif SC', serif;
-            --font-sans: 'Noto Sans SC', sans-serif;
-        }
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            overscroll-behavior-x: contain; /* Prevent pull-to-refresh on horizontal scroll */
-        }
-        .constructivism-card {
-            background-color: var(--card-background);
-            border: 2px solid var(--primary-color);
-            box-shadow: 5px 5px 0px var(--primary-color);
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            overflow: hidden; /* For geometric shapes */
-            position: relative; /* For pseudo-elements */
-        }
-        .constructivism-card h2, .constructivism-card h3 {
-            font-family: var(--font-serif);
-            font-weight: 700;
-            color: var(--primary-color);
-            text-transform: uppercase; /* Common in Constructivism */
-        }
-        .constructivism-card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-        .constructivism-card h3 {
-            font-size: 1.3rem;
-            margin-top: 1rem;
-            margin-bottom: 0.25rem;
-            border-bottom: 2px solid var(--secondary-color);
-            display: inline-block;
-        }
-        .constructivism-card p, .constructivism-card li {
-            font-family: var(--font-sans);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        .constructivism-card strong {
-            font-weight: 500;
-        }
-        .constructivism-card a {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-        .constructivism-card .meta-info {
-            font-size: 0.85rem;
-            color: var(--secondary-color);
-            margin-bottom: 1rem;
-        }
-        .constructivism-card::before { /* Diagonal element */
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: -50px;
-            width: 150px;
-            height: 150px;
-            background-color: var(--primary-color);
-            transform: rotate(45deg);
-            opacity: 0.1;
-            z-index: 0;
-        }
-        .constructivism-card::after { /* Geometric shape */
-            content: '';
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 80px;
-            height: 80px;
-            border: 5px solid var(--secondary-color);
-            opacity: 0.3;
-            z-index: 0;
-        }
-        .card-content {
-            position: relative; /* To ensure content is above pseudo-elements */
-            z-index: 1;
-        }
-
-        .horizontal-scroll-container {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory; /* Snap to cards */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            padding: 1rem; /* Padding around the scrollable area */
-            gap: 1rem; /* Space between cards */
-        }
-        .card-wrapper {
-            flex: 0 0 auto; /* Prevent cards from shrinking */
-            width: calc(100vw - 4rem); /* Card width, considering padding */
-            max-width: 400px; /* Max card width for larger screens */
-            scroll-snap-align: start; /* Snap to the start of each card */
-            min-height: 80vh; /* Ensure cards have a decent height */
-        }
-
-        @media (min-width: 768px) { /* For tablets and larger */
-            .card-wrapper {
-                width: calc(50vw - 4rem); /* Two cards side-by-side */
-            }
-        }
-        #map-container {
-            width: 100%;
-            height: 300px; /* Adjust as needed */
-            margin-top: 1rem;
-            border: 1px solid var(--secondary-color);
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* 禁止页面滚动 */
+        position: fixed; /* 固定页面 */
+        background-color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      #root {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: transparent !important;
+      }
+      
+      /* 防止iOS Safari的弹性滚动 */
+      body {
+        width: 100%;
+        height: 100vh;
+        overscroll-behavior: none;
+      }
     </style>
-</head>
-<body class="bg-gray-100">
-
-    <header class="bg-red-700 text-white p-6 shadow-lg constructivism-header">
-        <div class="container mx-auto">
-            <h1 class="text-4xl font-serif font-bold tracking-wider">南京两日游</h1>
-            <p class="text-lg font-sans">2025年6月7日 - 2025年6月8日 (共2天)</p>
-            <!-- Weather info can be added here -->
-        </div>
-    </header>
-
-    <main class="container mx-auto mt-4">
-        <div id="itinerary-cards" class="horizontal-scroll-container">
-            <!-- Itinerary cards will be injected here by JavaScript -->
-        </div>
-    </main>
-
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+    
+    <!-- 防止页面滚动和缩放 -->
     <script>
-        // IMPORTANT: User has confirmed AMap Key is set.
-        const A_MAP_KEY = '6aee4ea7c3fafff7b2778f3b8d159fd7'; 
-        let placeSearchService; // To be initialized after AMap API loads
-
-        async function fetchMarkdownContent(url) {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch markdown: ${response.statusText}`);
-            }
-            return await response.text();
+      // 防止双击缩放
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
         }
+        lastTouchEnd = now;
+      }, false);
 
-        function parseMarkdownToCards(markdownContent) {
-            const cards = [];
-            const sections = markdownContent.split('## 行程卡');
-            
-            const mainTitleMatch = markdownContent.match(/^#\\s*(.*)/);
-            const overallTitle = mainTitleMatch ? mainTitleMatch[1] : '行程计划';
-            
-            let dayTitle = '';
-            const dayTitleRegex = /^##\\s*Day\\s*\\d+:\\s*(.*)/m;
-
-            sections.slice(1).forEach(sectionText => {
-                const currentDayMatch = sectionText.match(dayTitleRegex);
-                if (currentDayMatch) {
-                    dayTitle = currentDayMatch[1].trim();
-                }
-                
-                const lines = sectionText.split('\\n');
-                const cardTitleMatch = lines[0].match(/^\\s*\\d+：(.*)/);
-                const cardTitle = cardTitleMatch ? cardTitleMatch[1].trim() : '行程详情';
-
-                let cardDate = '';
-                const dateRegex = /\\*\\*日期：\\*\\*\\s*(\\d{4}年\\d{1,2}月\\d{1,2}日)/;
-                const dateMatch = sectionText.match(dateRegex);
-                if (dateMatch) {
-                    cardDate = dateMatch[1];
-                }
-
-                const contentLines = lines.slice(1).filter(line => !line.startsWith('## Day') && !line.startsWith('**日期：**'));
-                const cardContentMarkdown = contentLines.join('\\n').trim();
-
-                cards.push({
-                    id: `card-${cards.length + 1}`,
-                    title: cardTitle,
-                    day: dayTitle,
-                    date: cardDate,
-                    content: marked.parse(cardContentMarkdown) 
-                });
-            });
-            return { overallTitle, cards };
-        }
-
-        function renderCards(overallTitle, cards) {
-            const container = document.getElementById('itinerary-cards');
-            container.innerHTML = ''; 
-
-            document.querySelector('header h1').textContent = overallTitle;
-
-            cards.forEach(card => {
-                const cardWrapper = document.createElement('div');
-                cardWrapper.className = 'card-wrapper';
-
-                const cardElement = document.createElement('div');
-                cardElement.id = card.id;
-                cardElement.className = 'constructivism-card p-6 rounded-lg shadow-xl h-full flex flex-col';
-                
-                let titleHTML = `<h2 class="text-2xl font-bold mb-2 text-red-700">${card.title}</h2>`;
-                if (card.date) {
-                    titleHTML += `<p class="meta-info text-sm text-gray-600 mb-3">${card.date}</p>`;
-                }
-                
-                cardElement.innerHTML = `
-                    <div class="card-content flex-grow">
-                        ${titleHTML}
-                        <div class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none">
-                            ${card.content}
-                        </div>
-                    </div>
-                    <div id="map-${card.id}" class="map-container mt-4 flex-shrink-0" style="min-height: 200px;"></div>
-                `;
-                cardWrapper.appendChild(cardElement);
-                container.appendChild(cardWrapper);
-            });
-        }
-        
-        function extractPoisFromCard(cardContentHtml) {
-            const poiRequests = [];
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(cardContentHtml, 'text/html');
-            const links = doc.querySelectorAll('a[href*="amap.com/place/"]');
-            
-            links.forEach(link => {
-                const url = link.href;
-                const name = link.textContent.trim();
-                const poiIdMatch = url.match(/amap\.com\/place\/([A-Z0-9]+)/); // Corrected regex
-                if (poiIdMatch && poiIdMatch[1]) {
-                    poiRequests.push({ name: name, poiId: poiIdMatch[1] });
-                }
-            });
-            return poiRequests;
-        }
-
-        async function initMap(containerId, poiRequests) {
-            if (A_MAP_KEY === 'YOUR_AMAP_KEY' || !window.AMap || !window.AMap.Map) {
-                console.warn("AMap API Key not configured or AMap not loaded. Map will not be displayed for:", containerId);
-                const mapDiv = document.getElementById(containerId);
-                if(mapDiv) mapDiv.innerHTML = '<p class="text-center text-red-500 p-4">地图加载失败：API密钥或地图脚本问题</p>';
-                return;
-            }
-
-            const map = new AMap.Map(containerId, {
-                zoom: 11,
-                center: [118.796877, 32.060255], // Default to Nanjing
-                resizeEnable: true
-            });
-
-            if (!placeSearchService) {
-                console.error("AMap.PlaceSearch service not initialized for map:", containerId);
-                const mapDiv = document.getElementById(containerId);
-                if(mapDiv) mapDiv.innerHTML = '<p class="text-center text-red-500 p-4">地图服务初始化失败</p>';
-                return;
-            }
-
-            if (poiRequests.length === 0) {
-                map.setCenter([118.796877, 32.060255]);
-                map.setZoom(11);
-                // Optionally, display a message in the map div
-                // const mapDiv = document.getElementById(containerId);
-                // if(mapDiv) mapDiv.innerHTML = '<p class="text-center text-gray-500 p-4">此卡片无指定地点信息</p>';
-                return;
-            }
-
-            const fetchedPois = [];
-            const promises = poiRequests.map(req => {
-                return new Promise((resolve, reject) => {
-                    placeSearchService.getDetails(req.poiId, (status, result) => {
-                        if (status === 'complete' && result.poiList && result.poiList.pois.length > 0) {
-                            const poiDetail = result.poiList.pois[0];
-                            fetchedPois.push({
-                                name: poiDetail.name || req.name,
-                                location: poiDetail.location 
-                            });
-                            resolve();
-                        } else {
-                            console.warn(`Failed to get details for POI ID: ${req.poiId}. Status: ${status}, Result:`, result);
-                            reject(new Error(`Failed to fetch details for ${req.poiId}`));
-                        }
-                    });
-                });
-            });
-
-            try {
-                await Promise.allSettled(promises);
-            } catch (error) {
-                console.error("Error fetching some POI details for map " + containerId + ":", error);
-            }
-            
-            if (fetchedPois.length > 0) {
-                fetchedPois.forEach(poi => {
-                    new AMap.Marker({
-                        position: poi.location,
-                        title: poi.name,
-                        map: map
-                    });
-                });
-
-                if (fetchedPois.length > 1) {
-                    const path = fetchedPois.map(p => p.location);
-                    new AMap.Polyline({
-                        path: path,
-                        borderWeight: 3,
-                        strokeColor: "#2C3E50", // Using secondary color
-                        strokeOpacity: 0.8,
-                        lineJoin: "round",
-                        map: map
-                    });
-                    map.setFitView(null, false, [60, 60, 60, 60]);
-                } else if (fetchedPois.length === 1) {
-                    map.setCenter(fetchedPois[0].location);
-                    map.setZoom(15);
-                }
-            } else {
-                const mapDiv = document.getElementById(containerId);
-                if(mapDiv) mapDiv.innerHTML = '<p class="text-center text-orange-500 p-4">未能获取到卡片中的地点信息</p>';
-                map.setCenter([118.796877, 32.060255]); 
-                map.setZoom(11);
-            }
-        }
-        
-        async function main() {
-            try {
-                await new Promise(resolve => { // Wait for AMap to be globally available
-                    const interval = setInterval(() => {
-                        if (window.AMap && typeof window.AMap.Map === 'function') {
-                            clearInterval(interval);
-                            resolve();
-                        }
-                    }, 50);
-                });
-
-                if (A_MAP_KEY !== 'YOUR_AMAP_KEY' && window.AMap) {
-                    await new Promise((resolve, reject) => {
-                        AMap.plugin('AMap.PlaceSearch', () => {
-                            try {
-                                placeSearchService = new AMap.PlaceSearch({
-                                    pageSize: 1, 
-                                    pageIndex: 1,
-                                    city: '025' // Nanjing city code
-                                });
-                                resolve();
-                            } catch (e) {
-                                console.error("Error initializing AMap.PlaceSearch:", e);
-                                placeSearchService = null; // Ensure it's null if failed
-                                reject(e);
-                            }
-                        });
-                    });
-                } else if (A_MAP_KEY === 'YOUR_AMAP_KEY') {
-                     console.warn("AMap API Key not configured. Maps will not load POIs.");
-                }
-
-                const markdownContent = await fetchMarkdownContent('plan.md');
-                const { overallTitle, cards } = parseMarkdownToCards(markdownContent);
-                renderCards(overallTitle, cards);
-
-                for (const card of cards) {
-                    const poiRequests = extractPoisFromCard(card.content);
-                    initMap(`map-${card.id}`, poiRequests); // Call async, let them run
-                }
-
-            } catch (error) {
-                console.error("Error loading itinerary:", error);
-                const container = document.getElementById('itinerary-cards');
-                if (container) {
-                    container.innerHTML = '<p class="text-red-500 text-center p-4">加载行程失败，请检查plan.md文件是否存在或网络连接。</p>';
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', main);
+      // 防止右键菜单
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+      });
     </script>
-</body>
+  </body>
 </html>
