@@ -18,6 +18,17 @@ export interface TravelCardData {
 
 // 从 plan.md 中提取的南京旅行数据
 export const travelCardsData: TravelCardData[] = [
+    {
+        id: 'day1-card0',
+        title: '出发前往南京',
+        category: '交通',
+        day: 'Day 1',
+        time: '09:00-12:42',
+        departureTime: '北京 09:00，上海 09:16',
+        arrivalTime: '上海 11:56，北京 12:29',
+        transportation: '北京G5 | 上海C3005',
+        description: ['充电器、充电宝、线', '相机', '雨伞', '身份证', '风衣', '浴巾','怪用品和怪玩具'],
+    },
     // Day 1: 初探金陵：长江大桥与美食夜游
     {
         id: 'day1-card1',
@@ -256,7 +267,7 @@ export const travelCardsData: TravelCardData[] = [
         category: '交通',
         day: 'Day 2',
         time: '15:00-16:39',
-        departureTime: '北京16:01发车，上海16:39发车',
+        departureTime: '北京 16:01，上海 16:39',
         transportation: '北京G20 | 上海C3005',
         description: ['务必在15:30前到达车站', '预留充足时间以免耽误行程'],
     }

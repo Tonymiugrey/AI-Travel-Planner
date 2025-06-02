@@ -7,7 +7,7 @@ import { themes } from './themes'
 
 const config = createTamagui({
   ...defaultConfig,
-  //themes,
+  themes,
   defaultFont: 'body',
   animations,
   shouldAddPrefersColorThemes: true,

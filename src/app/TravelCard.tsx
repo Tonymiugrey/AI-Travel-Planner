@@ -31,9 +31,9 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
       width="100%"
       height="100%"
       bg="$background"
-      shadowColor="$shadowColor"
-      shadowOffset={{ width: 0, height: 4 }}
-      shadowOpacity={0.1}
+      shadowColor="$shadow3"
+      shadowOffset={{ width: 0, height: 3 }}
+      shadowOpacity={0.5}
       shadowRadius={8}
       borderRadius="$6"
       overflow="hidden"
@@ -48,8 +48,8 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
             >
                 <XStack>
                     <Text
-                    fontSize="$2"
-                    color="$color11"
+                    fontSize="$3"
+                    color="$color10"
                     fontWeight="600"
                     textTransform="uppercase"
                     letterSpacing={1}
@@ -137,7 +137,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                         <Text
                         key={index}
                         fontSize="$2"
-                        color="$color11"
+                        color="$color10"
                         numberOfLines={2}
                         >
                         • {item}
@@ -155,7 +155,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                         <Text
                         key={index}
                         fontSize="$2"
-                        color="$color11"
+                        color="$color10"
                         numberOfLines={2}
                         >
                         • {item}
@@ -179,8 +179,8 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                         <Button
                         size="$2"
                         icon={Navigation}
-                        //bg="$blue8"
-                        //color="white"
+                        theme={"accent"}
+                        animation="medium"
                         onPress={handleNavigate}
                         fontWeight={600}
                         >
@@ -191,9 +191,9 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     {(data.highlights) && (
                         <Button
                         size="$2"
-                        //bg='orange'
-                        //color="white"
+                        theme={'accent'}
                         icon={Info}
+                        animation="medium"
                         onPress={() => setSheetOpen(true)}
                         fontWeight={600}
                         >
@@ -211,7 +211,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
           backgroundColor="$shadow6"
           enterStyle={{ opacity: 0 }}
           exitStyle={{ opacity: 0 }}/>
-        <Sheet.Handle bg='$color5' backdrop-blur-lg opacity='0.6' mb='$3'/>
+        <Sheet.Handle bg='$color4' opacity='0.8' mb='$3'/>
         <Sheet.Frame 
           p="$4" 
           gap="$4" 
@@ -298,7 +298,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     ),
                     a: ({ children, href }) => (
                       <Text 
-                        color="$blue10"
+                        color="$accent8"
                         textDecorationLine="underline"
                         onPress={() => {
                           if (href && typeof window !== 'undefined') {
