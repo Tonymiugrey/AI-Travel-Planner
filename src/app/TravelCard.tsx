@@ -193,7 +193,6 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                         size="$2"
                         theme={'accent'}
                         icon={Info}
-                        animation="medium"
                         onPress={() => setSheetOpen(true)}
                         fontWeight={600}
                         >
@@ -211,7 +210,16 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
           backgroundColor="$shadow6"
           enterStyle={{ opacity: 0 }}
           exitStyle={{ opacity: 0 }}/>
-        <Sheet.Handle bg='$color4' opacity='0.8' mb='$3'/>
+        <Sheet.Handle 
+          bg='rgba(255, 255, 255, 0.1)' 
+          mb='$3'
+          borderRadius="$2"
+          style={{
+            backdropFilter: 'blur(8px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(8px) saturate(180%)',
+            backgroundColor: 'rgba(223, 223, 223, 0.54)',
+          }}
+        />
         <Sheet.Frame 
           p="$4" 
           gap="$4" 
@@ -319,7 +327,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
             <Button
               size="$4"
               bg="$color5"
-              mb="$6"
+              mb="$4"
               onPress={() => setSheetOpen(false)}
             >
               关闭
