@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Card, Text, XStack, YStack, Sheet, H3, ScrollView, H4 } from 'tamagui'
-import { MapPin, Clock, Navigation, Info, X } from '@tamagui/lucide-icons'
+import { MapPin, Clock, Navigation, Info, X, RotateCcw } from '@tamagui/lucide-icons'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
@@ -12,9 +12,24 @@ interface TravelCardProps {
 
 export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [currentPlan, setCurrentPlan] = useState<'A' | 'B'>('A')
+  const [isFlipping, setIsFlipping] = useState(false)
+
+  // 获取当前显示的数据
+  const getCurrentData = () => {
+    if (currentPlan === 'B' && data.planB) {
+      return {
+        ...data,
+        ...data.planB
+      }
+    }
+    return data
+  }
+
+  const currentData = getCurrentData()
 
   const handleNavigate = () => {
-    const amapUrl = data.amapUrl
+    const amapUrl = currentData.amapUrl
     // In a real app, you would use Linking.openURL(amapUrl) for React Native
     // or window.open(amapUrl) for web
     if (typeof window !== 'undefined') {
@@ -22,26 +37,57 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
     }
   }
 
+  const togglePlan = () => {
+    if (isFlipping) return // 防止重复点击
+    
+    setIsFlipping(true)
+    
+    // 在动画中间点切换内容和颜色
+    setTimeout(() => {
+      setCurrentPlan(prev => prev === 'A' ? 'B' : 'A')
+    }, 500) // 在动画一半时切换
+    
+    // 动画结束后重置状态
+    setTimeout(() => {
+      setIsFlipping(false)
+    }, 1500) // 总动画时长
+  }
 
   return (
     <Card
       elevate
       size="$5"
       bordered
+      borderColor={currentPlan === 'B' ? "$accent7" : "$borderColor"}
       width="100%"
       height="100%"
-      bg="$background"
+      bg={currentPlan === 'B' ? "$accent3" : "$background"}
       shadowColor="$shadow3"
       shadowOffset={{ width: 0, height: 3 }}
       shadowOpacity={0.5}
       shadowRadius={8}
       borderRadius="$6"
       overflow="hidden"
+      style={{
+        perspective: '1000px',
+        transform: isFlipping ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+        transition: isFlipping ? 'transform 1.5s cubic-bezier(0.45, 0.56, 0.45, 0.94)' : 'none',
+        transformStyle: 'preserve-3d',
+        backfaceVisibility: 'show',
+      }}
     >
-        <YStack flex={1} p="$4" gap={"$4"}>
+        <YStack 
+          flex={1} 
+          p="$4" 
+          gap={"$4"}
+          style={{
+            transform: isFlipping ? 'scaleX(-1)' : 'scaleX(1)',
+            transition: isFlipping ? 'transform 0s linear 0.5s' : 'transform 0s linear',
+          }}
+        >
             {/* Header */}
             <YStack
-                bg="$color2"
+                bg={currentPlan === 'B' ? "$accent3" : "$color2"}
                 borderTopRightRadius="$6"
                 borderTopLeftRadius="$6"
                 gap="$4"
@@ -49,7 +95,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                 <XStack>
                     <Text
                     fontSize="$3"
-                    color="$color10"
+                    color={currentPlan === 'B' ? "$accent11" : "$color10"}
                     fontWeight="600"
                     textTransform="uppercase"
                     letterSpacing={1}
@@ -58,86 +104,124 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     {data.category}
                     </Text>
                     
-                    <Text
-                        bg="$color4"
-                        px="$2"
-                        py="$1"
-                        fontSize="$1"
-                        color="$color10"
-                        borderEndEndRadius={"$1"}
-                        borderStartStartRadius={"$1"}
-                        borderStartEndRadius={"$1"}
-                        borderEndStartRadius={"$1"}
-                    >
-                        {data.day} | {data.time}
-                    </Text>
+                    <XStack gap="$2">
+                        {data.planB && (
+                            <Text
+                                bg={currentPlan === 'B' ? "$accent9" : "$color4"}
+                                px="$2"
+                                py="$1"
+                                fontSize="$1"
+                                color={currentPlan === 'B' ? "$accent1" : "$color10"}
+                                borderEndEndRadius={"$1"}
+                                borderStartStartRadius={"$1"}
+                                borderStartEndRadius={"$1"}
+                                borderEndStartRadius={"$1"}
+                            >
+                                Plan {currentPlan}
+                            </Text>
+                        )}
+                        
+                        <Text
+                            bg={currentPlan === 'B' ? "$accent9" : "$color4"}
+                            px="$2"
+                            py="$1"
+                            fontSize="$1"
+                            color={currentPlan === 'B' ? "$accent1" : "$color10"}
+                            borderEndEndRadius={"$1"}
+                            borderStartStartRadius={"$1"}
+                            borderStartEndRadius={"$1"}
+                            borderEndStartRadius={"$1"}
+                        >
+                            {data.day} | {data.time}
+                        </Text>
+                    </XStack>
                 </XStack>
             </YStack>
-                            {/* Content */}
-                <YStack gap="$3">                
-                    <YStack gap="$3" >
+                            
+            {/* Content */}
+            <YStack gap="$3">                
+                <YStack gap="$3" >
+                    <XStack gap="$2">
+                        <XStack gap="$2" flex={1}>
+                            <MapPin size={16} color={currentPlan === 'B' ? "$accent11" : "$color11"} />
+                            <Text 
+                              fontSize="$3" 
+                              fontWeight="600" 
+                              color={currentPlan === 'B' ? "$accent12" : "$color11"} 
+                              flex={1}
+                            >
+                                {currentData.title}
+                            </Text>
+                        </XStack>
+                        {currentData.transportation && (
+                            <Text
+                                fontSize="$1"
+                                color={currentPlan === 'B' ? "$accent1" : "$color10"}
+                                bg={currentPlan === 'B' ? "$accent9" : "$color4"}
+                                px="$2"
+                                py="$1"
+                                borderEndEndRadius={"$1"}
+                                borderStartStartRadius={"$1"}
+                                borderStartEndRadius={"$1"}
+                                borderEndStartRadius={"$1"}
+                            >
+                                {currentData.transportation}
+                            </Text>
+                        )}
+                    </XStack>
+                </YStack>
+            </YStack>
+
+            <YStack gap="$3">
+                {(currentData.departureTime || currentData.arrivalTime || currentData.duration) && (
+                    <YStack gap="$2">
                         <XStack gap="$2">
-                            <XStack gap="$2" flex={1}>
-                                <MapPin size={16} color="$color11" />
-                                <Text fontSize="$3" fontWeight="600" color="$color11" flex={1}>
-                                    {data.title}
-                                </Text>
-                            </XStack>
-                            {data.transportation && (
-                                <Text
-                                    fontSize="$1"
-                                    color="$color10"
-                                    bg="$color4"
-                                    px="$2"
-                                    py="$1"
-                                    borderEndEndRadius={"$1"}
-                                    borderStartStartRadius={"$1"}
-                                    borderStartEndRadius={"$1"}
-                                    borderEndStartRadius={"$1"}
+                            <Clock size={16} color={currentPlan === 'B' ? "$accent11" : "$color11"} />
+                            <Text fontSize="$3" fontWeight="600" color={currentPlan === 'B' ? "$accent12" : "$color11"}>
+                                时间安排
+                            </Text>
+                        </XStack>
+                        <YStack gap="$1" pl="$5">
+                            {currentData.departureTime && (
+                                <Text 
+                                  fontSize="$2" 
+                                  color={currentPlan === 'B' ? "$accent10" : "$color10"}
                                 >
-                                    {data.transportation}
+                                  出发:    {currentData.departureTime}
                                 </Text>
                             )}
-                        </XStack>
-                    </YStack>
-                </YStack>
-
-                <YStack gap="$3">
-                    {(data.departureTime || data.arrivalTime || data.duration) && (
-                        <YStack gap="$2">
-                            <XStack gap="$2">
-                                <Clock size={16} color="$color11" />
-                                <Text fontSize="$3" fontWeight="600" color="$color11">
-                                    时间安排
+                            {currentData.arrivalTime && (
+                                 <Text 
+                                   fontSize="$2" 
+                                   color={currentPlan === 'B' ? "$accent10" : "$color10"}
+                                 >
+                                   到达:    {currentData.arrivalTime}
+                                 </Text>
+                            )}
+                            {currentData.duration && (
+                                <Text 
+                                  fontSize="$2" 
+                                  color={currentPlan === 'B' ? "$accent10" : "$color10"}
+                                >
+                                  停留时间:    {currentData.duration}
                                 </Text>
-                            </XStack>
-                            <YStack gap="$1" pl="$5">
-                                {data.departureTime && (
-                                    <Text fontSize="$2" color="$color10">出发:    {data.departureTime}</Text>
-                                )}
-                                {data.arrivalTime && (
-                                     <Text fontSize="$2" color="$color10">到达:    {data.arrivalTime}</Text>
-                                )}
-                                {data.duration && (
-                                    <Text fontSize="$2" color="$color10">停留时间:    {data.duration}</Text>
-                                )}
-                            </YStack>
+                            )}
                         </YStack>
-                    )}
-                </YStack>
+                    </YStack>
+                )}
+            </YStack>
 
-                <YStack gap="$3">
-
-                {data.description && (
+            <YStack gap="$3">
+                {currentData.description && (
                     <YStack gap="$2">
-                    <Text fontSize="$3" fontWeight="600" color="$color11">
+                    <Text fontSize="$3" fontWeight="600" color={currentPlan === 'B' ? "$accent12" : "$color11"}>
                         行程描述
                     </Text>
-                    {data.description.map((item, index) => (
+                    {currentData.description.map((item, index) => (
                         <Text
                         key={index}
                         fontSize="$2"
-                        color="$color10"
+                        color={currentPlan === 'B' ? "$accent10" : "$color10"}
                         numberOfLines={2}
                         >
                         • {item}
@@ -146,16 +230,16 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     </YStack>
                 )}
 
-                {data.tips && (
+                {currentData.tips && (
                     <YStack gap="$2">
-                    <Text fontSize="$3" fontWeight="600" color="$color11">
+                    <Text fontSize="$3" fontWeight="600" color={currentPlan === 'B' ? "$accent12" : "$color11"}>
                         小贴士
                     </Text>
-                    {data.tips.map((item, index) => (
+                    {currentData.tips.map((item, index) => (
                         <Text
                         key={index}
                         fontSize="$2"
-                        color="$color10"
+                        color={currentPlan === 'B' ? "$accent10" : "$color10"}
                         numberOfLines={2}
                         >
                         • {item}
@@ -163,24 +247,30 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     ))}
                     </YStack>
                 )}
-                </YStack>
+            </YStack>
         </YStack>
 
         {/* Footer */}
-        {(data.amapUrl || data.highlights) &&(
+        {(currentData.amapUrl || currentData.highlights || data.planB) &&(
             <YStack
                 p="$4"
-                bg="$color1"
+                bg={currentPlan === 'B' ? "$accent1" : "$color1"}
                 borderBottomRightRadius="$6"
                 borderBottomLeftRadius="$6"
+                style={{
+                  transform: isFlipping ? 'scaleX(-1)' : 'scaleX(1)',
+                  transition: isFlipping ? 'transform 0s linear 0.4s' : 'transform 0s linear',
+                }}
             >
-                <XStack gap={"$3"}>        
-                    {data.amapUrl && (
+                <XStack gap="$3">        
+                  <XStack flex={1} gap="$3">
+                      {currentData.amapUrl && (
                         <Button
                         size="$2"
                         icon={Navigation}
                         theme={"accent"}
-                        animation="medium"
+                        bg={currentPlan === 'B' ? "$accent5" : "$accent3"}
+                        //animation="medium"
                         onPress={handleNavigate}
                         fontWeight={600}
                         >
@@ -188,15 +278,32 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                         </Button>
                     )}
 
-                    {(data.highlights) && (
+                    {currentData.highlights && (
                         <Button
                         size="$2"
-                        theme={'accent'}
+                        theme={currentPlan === 'B' ? 'accent' : 'light'}
+                        bg={currentPlan === 'B' ? "$accent5" : "$color4"}
                         icon={Info}
                         onPress={() => setSheetOpen(true)}
                         fontWeight={600}
                         >
                         详细行程
+                        </Button>
+                    )}
+                  </XStack>
+
+
+                    {data.planB && (
+                        <Button
+                        size="$2"
+                        theme={currentPlan === 'B' ? 'accent' : 'light'}
+                        bg={currentPlan === 'B' ? "$accent5" : "$color4"}
+                        icon={RotateCcw}
+                        onPress={togglePlan}
+                        fontWeight={600}
+                        disabled={isFlipping}
+                        >
+                        切换方案
                         </Button>
                     )}
                 </XStack>
@@ -230,7 +337,19 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
         <Sheet.Handle/>
 
         <YStack gap="$4" flex={1}>
-            <H3 color="$color12">{data.title}</H3>
+            <XStack justifyContent="space-between" alignItems="center">
+                <H3 color="$color12" flex={1}>{currentData.title}</H3>
+                {data.planB && (
+                    <Button
+                        size="$2"
+                        theme={currentPlan === 'B' ? 'accent' : 'light'}
+                        icon={RotateCcw}
+                        onPress={togglePlan}
+                    >
+                        Plan {currentPlan}
+                    </Button>
+                )}
+            </XStack>
             
             <ScrollView flex={1} mb='$2'>
               <YStack gap="$2" p="$2">
@@ -319,7 +438,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     )
                   }}
                 >
-                  {data.highlights || '暂无详细内容'}
+                  {currentData.highlights || '暂无详细内容'}
                 </ReactMarkdown>
               </YStack>
             </ScrollView>

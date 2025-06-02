@@ -1,10 +1,6 @@
-// TravelCardData 接口定义
-export interface TravelCardData {
-  id: string
+// 基础卡片信息接口
+interface BaseTravelCardData {
   title: string
-  category: string
-  day: string
-  time: string
   departureTime?: string
   arrivalTime?: string
   duration?: string
@@ -16,8 +12,17 @@ export interface TravelCardData {
   cost?: string
 }
 
-// 从 plan.md 中提取的南京旅行数据
+// TravelCardData 接口定义
+export interface TravelCardData extends BaseTravelCardData {
+  id: string
+  category: string
+  day: string
+  time: string
+  planB?: BaseTravelCardData // 新增：备选方案
+}
+
 export const travelCardsData: TravelCardData[] = [
+    // Day 1
     {
         id: 'day1-card0',
         title: '出发前往南京',
@@ -29,7 +34,6 @@ export const travelCardsData: TravelCardData[] = [
         transportation: '北京G5 | 上海C3005',
         description: ['充电器、充电宝、线', '相机', '雨伞', '身份证', '风衣', '浴巾','怪用品和怪玩具'],
     },
-    // Day 1: 初探金陵：长江大桥与美食夜游
     {
         id: 'day1-card1',
         title: '前往冯家鸭子',
@@ -163,7 +167,7 @@ export const travelCardsData: TravelCardData[] = [
         amapUrl: 'https://www.amap.com/place/B0LA9DYYE8',
     },
 
-    // Day 2: 萌宠乐园与告别金陵
+    // Day 2
     {
         id: 'day2-card1',
         title: '退房，出发前往动物园',
@@ -246,7 +250,16 @@ export const travelCardsData: TravelCardData[] = [
         transportation: '步行',
         description: ['享用地道南京面食', '为下午行程补充能量'],
         amapUrl: 'https://www.amap.com/place/B0FFFLIYBK',
-        tips: ['备选: 徐家鸭子店(红山店)','若时间充裕，可考虑前往新街口'],
+        tips: ['若时间充裕，可考虑前往新街口'],
+        planB: {
+            title: '午餐安排：徐家鸭子店(红山店)',
+            departureTime: '13:00',
+            arrivalTime: '13:15',
+            duration: '约1小时',
+            transportation: '步行',
+            description: ['南京特色鸭肉料理', '体验当地老字号美食'],
+            amapUrl: 'https://ditu.amap.com/place/B0FFKX4C1F',
+        }
     },
     {
         id: 'day2-card5',
