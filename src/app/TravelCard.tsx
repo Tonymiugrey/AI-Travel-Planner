@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Card, Text, XStack, YStack, Sheet, H3, ScrollView, H4 } from 'tamagui'
 import { MapPin, Clock, Navigation, Info, X, RotateCcw } from '@tamagui/lucide-icons'
 import ReactMarkdown from 'react-markdown'
@@ -14,6 +14,18 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [currentPlan, setCurrentPlan] = useState<'A' | 'B'>('A')
   const [isFlipping, setIsFlipping] = useState(false)
+
+  // 从 localStorage 读取和保存 Plan 状态
+  useEffect(() => {
+    const savedPlan = localStorage.getItem(`travel-card-plan-${data.id}`)
+    if (savedPlan === 'B' && data.planB) {
+      setCurrentPlan('B')
+    }
+  }, [data.id, data.planB])
+
+  const savePlanToStorage = (plan: 'A' | 'B') => {
+    localStorage.setItem(`travel-card-plan-${data.id}`, plan)
+  }
 
   // 获取当前显示的数据
   const getCurrentData = () => {
@@ -44,7 +56,9 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
     
     // 在动画中间点切换内容和颜色
     setTimeout(() => {
-      setCurrentPlan(prev => prev === 'A' ? 'B' : 'A')
+      const newPlan = currentPlan === 'A' ? 'B' : 'A'
+      setCurrentPlan(newPlan)
+      savePlanToStorage(newPlan) // 保存到 localStorage
     }, 500) // 在动画一半时切换
     
     // 动画结束后重置状态
