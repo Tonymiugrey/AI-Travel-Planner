@@ -128,7 +128,7 @@ export const travelCardsData: TravelCardData[] = [
     },
     {
         id: 'day1-card10',
-        title: '日式晚餐',
+        title: '日式晚餐：松澜·烧鸟酒场(云南北路店)',
         category: '美食',
         day: 'Day 1',
         time: '19:30-21:30',
@@ -225,7 +225,7 @@ export const travelCardsData: TravelCardData[] = [
     },
     {
         id: 'day2-card4',
-        title: '午餐安排',
+        title: '午餐安排：滕家面馆(红山店)',
         category: '美食',
         day: 'Day 2',
         time: '13:00-14:15',
