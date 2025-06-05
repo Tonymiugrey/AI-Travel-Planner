@@ -1,5 +1,9 @@
-// 基础卡片信息接口
-interface BaseTravelCardData {
+// TravelCardData 接口定义
+export interface TravelCardData {
+  id: string
+  category: string
+  day: string
+  time: string
   title: string
   departureTime?: string
   arrivalTime?: string
@@ -9,17 +13,26 @@ interface BaseTravelCardData {
   highlights?: string
   amapUrl?: string
   tips?: string[]
-  cost?: string
+  isPlanB?: boolean // 新增：是否为备选方案
+  planAId?: string // 新增：如果isPlanB为true，则表示其关联的Plan A卡片的ID
 }
 
-// TravelCardData 接口定义
-export interface TravelCardData extends BaseTravelCardData {
-  id: string
-  category: string
-  day: string
-  time: string
-  planB?: BaseTravelCardData // 新增：备选方案
-}
+// 旅行类别枚举
+export const TRAVEL_CATEGORIES = [
+  { value: '交通', label: '交通' },
+  { value: '美食', label: '美食' },
+  { value: '住宿', label: '住宿' },
+  { value: '休息', label: '休息' },
+  { value: '观光', label: '观光' },
+  { value: '文化', label: '文化' },
+  { value: '娱乐', label: '娱乐' }
+] as const
+
+// 旅行日期枚举
+export const TRAVEL_DAYS = [
+  { value: 'Day 1', label: 'Day 1' },
+  { value: 'Day 2', label: 'Day 2' }
+] as const
 
 export const travelCardsData: TravelCardData[] = [
     // Day 1
@@ -173,7 +186,7 @@ export const travelCardsData: TravelCardData[] = [
         title: '退房，出发前往动物园',
         category: '住宿',
         day: 'Day 2',
-        time: '7:00-8:15',
+        time: '07:00-08:15',
         departureTime: '07:50',
         arrivalTime: '08:05',
         transportation: '步行',
@@ -193,7 +206,7 @@ export const travelCardsData: TravelCardData[] = [
         title: '肯德基早餐与行李寄存',
         category: '美食',
         day: 'Day 2',
-        time: '8:05-8:20',
+        time: '08:05-08:20',
         duration: '约15分钟',
         transportation: '步行',
         description: [
@@ -211,26 +224,25 @@ export const travelCardsData: TravelCardData[] = [
         title: '红山森林动物园游览',
         category: '娱乐',
         day: 'Day 2',
-        time: '8:30-13:00',
+        time: '08:30-13:00',
         duration: '约4.5小时',
         transportation: '步行+观光车',
         description: [
             '北门入园游览',
             '重点观看猫科动物和鸟类'
         ],
-        highlights: `
-### 1. 北门区域及观光车：
-- 可选择参观大熊猫馆（早晨大熊猫可能较为活跃，具体参观时间请灵活安排在乘坐观光车前）。
-- 随后乘坐园内观光车前往中心广场区域。
+        highlights: `### 1. 北门区域及观光车：
+                    - 可选择参观大熊猫馆（早晨大熊猫可能较为活跃，具体参观时间请灵活安排在乘坐观光车前）。
+                    - 随后乘坐园内观光车前往中心广场区域。
 
-### 2. 中心广场周边主要场馆：
-- 抵达中心广场后，依次游览考拉馆、高黎贡山生态多样性展区（小熊猫、各种鸟类等）、企鹅馆、虎山/狮虎山、中国猫科馆、猫科星球（小型猫科动物）、狼谷、本土动物区、细尾獴馆。
+                    ### 2. 中心广场周边主要场馆：
+                    - 抵达中心广场后，依次游览考拉馆、高黎贡山生态多样性展区（小熊猫、各种鸟类等）、企鹅馆、虎山/狮虎山、中国猫科馆、猫科星球（小型猫科动物）、狼谷、本土动物区、细尾獴馆。
 
-### 3. 小红山片区及返回：
+                    ### 3. 小红山片区及返回：
 
-- 前往小红山片区，游览热带鸟馆、犀鸟馆、鹦鹉馆、雉鸡园、鹤园、狐猴岛。
-- 游览完毕后，从此区域或根据园内指引返回北门准备出园。
-- 可在出园前，于北门附近的“森林市集”文创店选购纪念品（可选，约安排在12:20 PM - 12:45 PM）。
+                    - 前往小红山片区，游览热带鸟馆、犀鸟馆、鹦鹉馆、雉鸡园、鹤园、狐猴岛。
+                    - 游览完毕后，从此区域或根据园内指引返回北门准备出园。
+                    - 可在出园前，于北门附近的“森林市集”文创店选购纪念品（可选，约安排在12:20 PM - 12:45 PM）。
         `,
         tips: [
             '夏季蚊虫较多，建议采取防蚊措施',
@@ -251,15 +263,21 @@ export const travelCardsData: TravelCardData[] = [
         description: ['享用地道南京面食', '为下午行程补充能量'],
         amapUrl: 'https://www.amap.com/place/B0FFFLIYBK',
         tips: ['若时间充裕，可考虑前往新街口'],
-        planB: {
-            title: '午餐安排：徐家鸭子店(红山店)',
-            departureTime: '13:00',
-            arrivalTime: '13:15',
-            duration: '约1小时',
-            transportation: '步行',
-            description: ['南京特色鸭肉料理', '体验当地老字号美食'],
-            amapUrl: 'https://ditu.amap.com/place/B0FFKX4C1F',
-        }
+    },
+    {
+        id: 'day2-card4-planB',
+        title: '午餐安排：徐家鸭子店(红山店)',
+        category: '美食', // 假设类别与Plan A相同
+        day: 'Day 2',    // 假设日期与Plan A相同
+        time: '13:00-14:15', // 假设时间与Plan A相同或根据实际情况调整
+        departureTime: '13:00',
+        arrivalTime: '13:15',
+        duration: '约1小时',
+        transportation: '步行',
+        description: ['南京特色鸭肉料理', '体验当地老字号美食'],
+        amapUrl: 'https://ditu.amap.com/place/B0FFKX4C1F',
+        isPlanB: true,
+        planAId: 'day2-card4',
     },
     {
         id: 'day2-card5',

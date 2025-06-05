@@ -5,11 +5,25 @@ import { TravelCardData } from '../data/travelData'
 
 interface CardCarouselProps {
   cards: TravelCardData[]
+  allCards?: TravelCardData[] // 新增：所有卡片数据，用于查找 planB
   onCardChange?: (index: number) => void
   currentIndex?: number
+  onUpdateCard?: (updatedCard: TravelCardData) => void // 新增：更新卡片回调
+  onDeleteCard?: (cardId: string) => void // 新增：删除卡片回调
+  onEdit?: (card: TravelCardData) => void // 新增：编辑卡片回调
+  onCreatePlanB?: (card: TravelCardData) => void // 新增：创建planB回调
 }
 
-export const CardCarousel: React.FC<CardCarouselProps> = ({ cards, onCardChange, currentIndex = 0 }) => {
+export const CardCarousel: React.FC<CardCarouselProps> = ({ 
+  cards, 
+  allCards = [], 
+  onCardChange, 
+  currentIndex = 0,
+  onUpdateCard,
+  onDeleteCard,
+  onEdit,
+  onCreatePlanB
+}) => {
   const scrollViewRef = useRef<any>(null)
   const [containerWidth, setContainerWidth] = useState(0)
   const [internalIndex, setInternalIndex] = useState(currentIndex) // 添加内部索引状态
@@ -58,11 +72,16 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({ cards, onCardChange,
     }
   }  // 当外部 currentIndex 或 containerWidth 变化时，滚动到对应位置
   useEffect(() => {
-    console.log('Effect触发:', { currentIndex, containerWidth, cardsLength: cards.length })
+    console.log('CardCarousel Effect触发:', { 
+      currentIndex, 
+      containerWidth, 
+      cardsLength: cards.length,
+      scrollViewRef: !!scrollViewRef.current 
+    })
     
     if (containerWidth > 0 && scrollViewRef.current && cards.length > 0) {
       const validIndex = Math.max(0, Math.min(currentIndex, cards.length - 1))
-      console.log('滚动到索引:', validIndex)
+      console.log('CardCarousel 准备滚动到索引:', validIndex, '目标位置:', validIndex * containerWidth)
       
       // 同时更新内部索引状态，确保分页指示器同步
       setInternalIndex(validIndex)
@@ -70,6 +89,14 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({ cards, onCardChange,
       scrollViewRef.current.scrollTo({
         x: validIndex * containerWidth, 
         animated: containerWidth > 0 // 有宽度时才使用动画
+      })
+      
+      console.log('CardCarousel 滚动命令已发送')
+    } else {
+      console.log('CardCarousel 滚动条件不满足:', {
+        hasContainerWidth: containerWidth > 0,
+        hasScrollViewRef: !!scrollViewRef.current,
+        hasCards: cards.length > 0
       })
     }
   }, [currentIndex, containerWidth, cards.length])
@@ -99,7 +126,14 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({ cards, onCardChange,
               height={480}
               p="$4"
             >
-              <TravelCard data={card} />
+              <TravelCard 
+                data={card} 
+                allCards={allCards} 
+                onUpdate={onUpdateCard}
+                onDelete={onDeleteCard}
+                onEdit={onEdit}
+                onCreatePlanB={onCreatePlanB}
+              />
             </YStack>
           ))}
         </ScrollView>

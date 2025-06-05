@@ -22,6 +22,7 @@
     "@tamagui/react-native-svg": "^1.126.13",
     "@tamagui/static": "^1.126.13",
     "@tamagui/web": "^1.126.13",
+    "leancloud-storage": "^4.15.2",
     "react": "*",
     "react-dom": "*",
     "react-markdown": "^10.1.0",

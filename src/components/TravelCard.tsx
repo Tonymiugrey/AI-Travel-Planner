@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Card, Text, XStack, YStack, Sheet, H3, ScrollView, H4 } from 'tamagui'
-import { MapPin, Clock, Navigation, Info, X, RotateCcw } from '@tamagui/lucide-icons'
+import { MapPin, Clock, Navigation, Info, X, RotateCcw, Edit3, Plus } from '@tamagui/lucide-icons'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
@@ -8,20 +8,30 @@ import { TravelCardData } from '../data/travelData'
 
 interface TravelCardProps {
   data: TravelCardData
+  allCards?: TravelCardData[] // 新增：所有卡片数据，用于查找 planB
+  onUpdate?: (updatedCard: TravelCardData) => void // 新增：更新卡片回调
+  onDelete?: (cardId: string) => void // 新增：删除卡片回调
+  onEdit?: (card: TravelCardData) => void // 新增：编辑卡片回调
+  onCreatePlanB?: (card: TravelCardData) => void // 新增：创建planB回调
 }
 
-export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
+export const TravelCard: React.FC<TravelCardProps> = ({ data, allCards = [], onUpdate, onDelete, onEdit, onCreatePlanB }) => {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [currentPlan, setCurrentPlan] = useState<'A' | 'B'>('A')
   const [isFlipping, setIsFlipping] = useState(false)
 
+  // 查找对应的 Plan B 卡片
+  const planBCard = allCards.find(card => card.isPlanB && card.planAId === data.id)
+
   // 从 localStorage 读取和保存 Plan 状态
   useEffect(() => {
     const savedPlan = localStorage.getItem(`travel-card-plan-${data.id}`)
-    if (savedPlan === 'B' && data.planB) {
+    if (savedPlan === 'B' && planBCard) {
       setCurrentPlan('B')
+    } else {
+      setCurrentPlan('A')
     }
-  }, [data.id, data.planB])
+  }, [data.id, planBCard])
 
   const savePlanToStorage = (plan: 'A' | 'B') => {
     localStorage.setItem(`travel-card-plan-${data.id}`, plan)
@@ -29,11 +39,8 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
 
   // 获取当前显示的数据
   const getCurrentData = () => {
-    if (currentPlan === 'B' && data.planB) {
-      return {
-        ...data,
-        ...data.planB
-      }
+    if (currentPlan === 'B' && planBCard) {
+      return planBCard
     }
     return data
   }
@@ -119,7 +126,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     </Text>
                     
                     <XStack gap="$2">
-                        {data.planB && (
+                        {planBCard && (
                             <Text
                                 bg={currentPlan === 'B' ? "$accent9" : "$color4"}
                                 px="$2"
@@ -146,7 +153,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                             borderStartEndRadius={"$1"}
                             borderEndStartRadius={"$1"}
                         >
-                            {data.day} | {data.time}
+                            {currentData.day} | {currentData.time}
                         </Text>
                     </XStack>
                 </XStack>
@@ -226,7 +233,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
             </YStack>
 
             <YStack gap="$3">
-                {currentData.description && (
+                {currentData.description && Array.isArray(currentData.description) && currentData.description.length > 0 && (
                     <YStack gap="$2">
                     <Text fontSize="$3" fontWeight="600" color={currentPlan === 'B' ? "$accent12" : "$color11"}>
                         行程描述
@@ -244,7 +251,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                     </YStack>
                 )}
 
-                {currentData.tips && (
+                {currentData.tips && Array.isArray(currentData.tips) && currentData.tips.length > 0 && (
                     <YStack gap="$2">
                     <Text fontSize="$3" fontWeight="600" color={currentPlan === 'B' ? "$accent12" : "$color11"}>
                         小贴士
@@ -265,81 +272,103 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
         </YStack>
 
         {/* Footer */}
-        {(currentData.amapUrl || currentData.highlights || data.planB) &&(
-            <YStack
-                p="$4"
-                bg={currentPlan === 'B' ? "$accent1" : "$color1"}
-                borderBottomRightRadius="$6"
-                borderBottomLeftRadius="$6"
-                style={{
-                  transform: isFlipping ? 'scaleX(-1)' : 'scaleX(1)',
-                  transition: isFlipping ? 'transform 0s linear 0.4s' : 'transform 0s linear',
-                }}
-            >
-                <XStack gap="$3">        
-                  <XStack flex={1} gap="$3">
-                      {currentData.amapUrl && (
-                        <Button
-                        size="$2"
-                        icon={Navigation}
-                        theme={"accent"}
-                        bg={currentPlan === 'B' ? "$accent5" : "$accent3"}
-                        //animation="medium"
-                        onPress={handleNavigate}
-                        fontWeight={600}
-                        >
-                        导航
-                        </Button>
-                    )}
+        <YStack
+            p="$4"
+            bg={currentPlan === 'B' ? "$accent1" : "$color1"}
+            borderBottomRightRadius="$6"
+            borderBottomLeftRadius="$6"
+            style={{
+              transform: isFlipping ? 'scaleX(-1)' : 'scaleX(1)',
+              transition: isFlipping ? 'transform 0s linear 0.4s' : 'transform 0s linear',
+            }}
+        >
+            <XStack gap="$2">        
+              <XStack flex={1} gap="$3">
+                  {currentData.amapUrl && (
+                    <Button
+                    size="$2"
+                    icon={Navigation}
+                    theme={"accent"}
+                    bg={currentPlan === 'B' ? "$accent5" : "$accent3"}
+                    //animation="medium"
+                    onPress={handleNavigate}
+                    fontWeight={600}
+                    >
+                    导航
+                    </Button>
+                )}
 
-                    {currentData.highlights && (
-                        <Button
-                        size="$2"
-                        theme={currentPlan === 'B' ? 'accent' : 'light'}
-                        bg={currentPlan === 'B' ? "$accent5" : "$color4"}
-                        icon={Info}
-                        onPress={() => setSheetOpen(true)}
-                        fontWeight={600}
-                        >
-                        详细行程
-                        </Button>
-                    )}
-                  </XStack>
+                {currentData.highlights && (
+                    <Button
+                    size="$2"
+                    theme={currentPlan === 'B' ? 'accent' : 'light'}
+                    bg={currentPlan === 'B' ? "$accent5" : "$color4"}
+                    icon={Info}
+                    onPress={() => setSheetOpen(true)}
+                    fontWeight={600}
+                    >
+                    详细行程
+                    </Button>
+                )}
+              </XStack>
 
+              <Button
+                  size="$2"
+                  theme="light"
+                  icon={Edit3}
+                  onPress={() => onEdit?.(currentData)}
+                  fontWeight={600}
+              >
+                  编辑
+              </Button>
 
-                    {data.planB && (
-                        <Button
-                        size="$2"
-                        theme={currentPlan === 'B' ? 'accent' : 'light'}
-                        bg={currentPlan === 'B' ? "$accent5" : "$color4"}
-                        icon={RotateCcw}
-                        onPress={togglePlan}
-                        fontWeight={600}
-                        disabled={isFlipping}
-                        >
-                        切换方案
-                        </Button>
-                    )}
-                </XStack>
-            </YStack>
-        )}
+              {!planBCard && !data.isPlanB && (
+                <Button
+                  size="$2"
+                  theme="light"
+                  icon={Plus}
+                  bg="$color4"
+                  onPress={() => onCreatePlanB?.(data)}
+                  fontWeight={600}
+                >
+                  新增方案
+                </Button>
+              )}
+              
+              {planBCard && (
+                  <Button
+                  size="$2"
+                  theme={currentPlan === 'B' ? 'accent' : 'light'}
+                  bg={currentPlan === 'B' ? "$accent5" : "$color4"}
+                  icon={RotateCcw}
+                  onPress={togglePlan}
+                  fontWeight={600}
+                  disabled={isFlipping}
+                  >
+                  切换方案
+                  </Button>
+              )}
+            </XStack>
+        </YStack>
 
       {/* Sheet Modal */}
-      <Sheet modal={true} open={sheetOpen} onOpenChange={setSheetOpen} dismissOnSnapToBottom snapPointsMode="percent" snapPoints={[90]}>
+      <Sheet 
+        modal={true} 
+        open={sheetOpen} 
+        onOpenChange={setSheetOpen} 
+        dismissOnSnapToBottom 
+        forceRemoveScrollEnabled={sheetOpen}
+        snapPoints={[90]}
+      >
         <Sheet.Overlay         
           animation="lazy"
           backgroundColor="$shadow6"
           enterStyle={{ opacity: 0 }}
           exitStyle={{ opacity: 0 }}/>
         <Sheet.Handle 
-          bg='rgba(255, 255, 255, 0.1)' 
+          bg='$color4'
           mb='$3'
           borderRadius="$2"
-          style={{
-            backdropFilter: 'blur(8px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(8px) saturate(180%)',
-            backgroundColor: 'rgba(223, 223, 223, 0.54)',
-          }}
         />
         <Sheet.Frame 
           p="$4" 
@@ -348,24 +377,11 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
           borderTopLeftRadius="$6"
           borderTopRightRadius="$6"
         >
-        <Sheet.Handle/>
 
         <YStack gap="$4" flex={1}>
-            <XStack justifyContent="space-between" alignItems="center">
-                <H3 color="$color12" flex={1}>{currentData.title}</H3>
-                {data.planB && (
-                    <Button
-                        size="$2"
-                        theme={currentPlan === 'B' ? 'accent' : 'light'}
-                        icon={RotateCcw}
-                        onPress={togglePlan}
-                    >
-                        Plan {currentPlan}
-                    </Button>
-                )}
-            </XStack>
+            <H3 color="$color12" mt='$2' flex={1}>{currentData.title}</H3>
             
-            <ScrollView flex={1} mb='$2'>
+            <Sheet.ScrollView flex={1} mb='$2'>
               <YStack gap="$2" p="$2">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -455,7 +471,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data }) => {
                   {currentData.highlights || '暂无详细内容'}
                 </ReactMarkdown>
               </YStack>
-            </ScrollView>
+            </Sheet.ScrollView>
 
             <Button
               size="$4"
