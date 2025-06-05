@@ -122,7 +122,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data, allCards = [], onU
                     letterSpacing={1}
                     flex={1}
                     >
-                    {data.category}
+                    {currentData.category}
                     </Text>
                     
                     <XStack gap="$2">
