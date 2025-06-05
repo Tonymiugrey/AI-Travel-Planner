@@ -314,20 +314,20 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data, allCards = [], onU
 
               <Button
                   size="$2"
-                  theme="light"
+                  theme={currentPlan === 'B' ? 'accent' : 'light'}
+                  bg={currentPlan === 'B' ? "$accent5" : "$color4"}
                   icon={Edit3}
                   onPress={() => onEdit?.(currentData)}
                   fontWeight={600}
               >
-                  编辑
               </Button>
 
               {!planBCard && !data.isPlanB && (
                 <Button
                   size="$2"
-                  theme="light"
+                  theme={currentPlan === 'B' ? 'accent' : 'light'}
+                  bg={currentPlan === 'B' ? "$accent5" : "$color4"}
                   icon={Plus}
-                  bg="$color4"
                   onPress={() => onCreatePlanB?.(data)}
                   fontWeight={600}
                 >
