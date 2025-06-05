@@ -523,7 +523,7 @@ export function HomeScreen() {
                 alignItems="center" 
                 gap="$2"
               >
-              <H1>
+              <H1 fontWeight="700">
                 南京之旅
               </H1>
                 <XStack gap="$3">
@@ -581,14 +581,14 @@ export function HomeScreen() {
               
               animation="medium"
               animateOnly={['backgroundColor', 'borderColor', 'color']}
-              backgroundColor={selectedDay === 'Day 1' ? '$color9' : 'transparent'}
-              borderColor={selectedDay === 'Day 1' ? '$color10' : '$borderColor'}
+              backgroundColor={selectedDay === 'Day 1' ? '$color8' : 'transparent'}
+              borderColor={selectedDay === 'Day 1' ? '$color9' : '$borderColor'}
               borderWidth={1.5}
-              color={selectedDay === 'Day 1' ? '$color1' : '$color10'}
+              color={selectedDay === 'Day 1' ? '$color1' : '$color9'}
               hoverStyle={{
-                backgroundColor: selectedDay === 'Day 1' ? '$color9' : 'transparent',
-                borderColor: selectedDay === 'Day 1' ? '$color10' : '$borderColor',
-                color: selectedDay === 'Day 1' ? '$color1' : '$color10',
+                backgroundColor: selectedDay === 'Day 1' ? '$color8' : 'transparent',
+                borderColor: selectedDay === 'Day 1' ? '$color9' : '$borderColor',
+                color: selectedDay === 'Day 1' ? '$color1' : '$color9',
               }}
             >
               Day 1
@@ -600,14 +600,14 @@ export function HomeScreen() {
               onPress={() => switchDay('Day 2')}
               animation="medium"
               animateOnly={['backgroundColor', 'borderColor', 'color']}
-              backgroundColor={selectedDay === 'Day 2' ? '$color9' : 'transparent'}
-              borderColor={selectedDay === 'Day 2' ? '$color10' : '$borderColor'}
+              backgroundColor={selectedDay === 'Day 2' ? '$color8' : 'transparent'}
+              borderColor={selectedDay === 'Day 2' ? '$color9' : '$borderColor'}
               borderWidth={1.5}
-              color={selectedDay === 'Day 2' ? '$color1' : '$color10'}
+              color={selectedDay === 'Day 2' ? '$color1' : '$color9'}
               hoverStyle={{
-                backgroundColor: selectedDay === 'Day 2' ? '$color9' : 'transparent',
-                borderColor: selectedDay === 'Day 2' ? '$color10' : '$borderColor',
-                color: selectedDay === 'Day 2' ? '$color1' : '$color10',
+                backgroundColor: selectedDay === 'Day 2' ? '$color8' : 'transparent',
+                borderColor: selectedDay === 'Day 2' ? '$color9' : '$borderColor',
+                color: selectedDay === 'Day 2' ? '$color1' : '$color9',
               }}
             >
               Day 2

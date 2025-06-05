@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Card, Text, XStack, YStack, Sheet, H3, ScrollView, H4 } from 'tamagui'
-import { MapPin, Clock, Navigation, Info, X, RotateCcw, Edit3, Plus } from '@tamagui/lucide-icons'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
-import remarkGfm from 'remark-gfm'
+import { Button, Card, Text, XStack, YStack } from 'tamagui'
+import { MapPin, Clock, Navigation, Info, RotateCcw, Edit3, Plus } from '@tamagui/lucide-icons'
 import { TravelCardData } from '../data/travelData'
+import { MarkdownDetailSheet } from './MarkdownDetailSheet'
 
 interface TravelCardProps {
   data: TravelCardData
@@ -294,7 +292,6 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data, allCards = [], onU
                     onPress={handleNavigate}
                     fontWeight={600}
                     >
-                    导航
                     </Button>
                 )}
 
@@ -307,7 +304,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data, allCards = [], onU
                     onPress={() => setSheetOpen(true)}
                     fontWeight={600}
                     >
-                    详细行程
+                    详情
                     </Button>
                 )}
               </XStack>
@@ -329,7 +326,7 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data, allCards = [], onU
                   bg={currentPlan === 'B' ? "$accent5" : "$color4"}
                   icon={Plus}
                   onPress={() => onCreatePlanB?.(data)}
-                  fontWeight={600}
+                  fontWeight={400}
                 >
                   新增方案
                 </Button>
@@ -351,139 +348,13 @@ export const TravelCard: React.FC<TravelCardProps> = ({ data, allCards = [], onU
             </XStack>
         </YStack>
 
-      {/* Sheet Modal */}
-      <Sheet 
-        modal={true} 
-        open={sheetOpen} 
-        onOpenChange={setSheetOpen} 
-        dismissOnSnapToBottom 
-        forceRemoveScrollEnabled={sheetOpen}
-        snapPoints={[90]}
-      >
-        <Sheet.Overlay         
-          animation="lazy"
-          backgroundColor="$shadow6"
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}/>
-        <Sheet.Handle 
-          bg='$color4'
-          mb='$3'
-          borderRadius="$2"
-        />
-        <Sheet.Frame 
-          p="$4" 
-          gap="$4" 
-          bg="$background"
-          borderTopLeftRadius="$6"
-          borderTopRightRadius="$6"
-        >
-
-        <YStack gap="$4" flex={1}>
-            <H3 color="$color12" mt='$2' flex={1}>{currentData.title}</H3>
-            
-            <Sheet.ScrollView flex={1} mb='$2'>
-              <YStack gap="$2" p="$2">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeRaw]}
-                  components={{
-                    p: ({ children }) => (
-                      <YStack mb="$2">
-                        <Text 
-                          fontSize="$3" 
-                          color="$color11" 
-                          lineHeight="$2"
-                        >
-                          {children}
-                        </Text>
-                      </YStack>
-                    ),
-                    h1: ({ children }) => (
-                      <YStack mb="$3">
-                        <Text 
-                          fontSize="$6" 
-                          fontWeight="bold"
-                          color="$color12"
-                        >
-                          {children}
-                        </Text>
-                      </YStack>
-                    ),
-                    h2: ({ children }) => (
-                      <YStack mb="$3">
-                        <Text 
-                          fontSize="$5" 
-                          fontWeight="bold"
-                          color="$color12"
-                        >
-                          {children}
-                        </Text>
-                      </YStack>
-                    ),
-                    h3: ({ children }) => (
-                      <YStack mb="$1">
-                        <Text 
-                          fontSize="$4" 
-                          fontWeight="600"
-                          color="$color12"
-                        >
-                          {children}
-                        </Text>
-                      </YStack>
-                    ),
-                    ul: ({ children }) => (
-                      <YStack gap="$1" mb="$2">
-                        {children}
-                      </YStack>
-                    ),
-                    li: ({ children }) => (
-                      <Text 
-                        fontSize="$3" 
-                        color="$color10" 
-                        lineHeight="$1"
-                      >
-                        • {children}
-                      </Text>
-                    ),
-                    strong: ({ children }) => (
-                      <Text 
-                        fontWeight="bold"
-                        color="$color12"
-                      >
-                        {children}
-                      </Text>
-                    ),
-                    a: ({ children, href }) => (
-                      <Text 
-                        color="$accent8"
-                        textDecorationLine="underline"
-                        onPress={() => {
-                          if (href && typeof window !== 'undefined') {
-                            window.open(href, '_blank')
-                          }
-                        }}
-                      >
-                        {children}
-                      </Text>
-                    )
-                  }}
-                >
-                  {currentData.highlights || '暂无详细内容'}
-                </ReactMarkdown>
-              </YStack>
-            </Sheet.ScrollView>
-
-            <Button
-              size="$4"
-              bg="$color5"
-              mb="$4"
-              onPress={() => setSheetOpen(false)}
-            >
-              关闭
-            </Button>
-          </YStack>
-        </Sheet.Frame>
-      </Sheet>
+      {/* Markdown Detail Sheet */}
+      <MarkdownDetailSheet
+        isOpen={sheetOpen}
+        onOpenChange={setSheetOpen}
+        title={currentData.title}
+        content={currentData.highlights || ''}
+      />
     </Card>
   )
 }

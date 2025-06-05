@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Sheet, YStack, XStack, Input, TextArea, Button, Text, H4, Separator, Spinner, Select, Adapt } from 'tamagui'
+import { useState, useEffect, useRef } from 'react'
+import { Sheet, YStack, XStack, Input, TextArea, Button, Text, H4, Separator, Spinner, Select, Adapt, ScrollView } from 'tamagui'
 import { TravelCardData } from '../data/travelData'
 import { TRAVEL_CATEGORIES, TRAVEL_DAYS } from '../data/travelData'
 import { X, Save, Clock, MapPin, Info, Bookmark, Trash2, AlertTriangle, ChevronDown, Check } from '@tamagui/lucide-icons' // Added AlertTriangle, ChevronDown, Check
@@ -26,6 +26,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
 }) => {
   const { updateCardWithSync } = useData()
   const { theme } = useTheme()
+  const scrollViewRef = useRef<any>(null)
   
   // 使用默认值防止card为null时组件崩溃
   const safeCard = card || {
@@ -102,7 +103,20 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
     setValidationErrors({})
     setIsLoading(false)
     setNeedsSync(false)
-  }, [card]) // 依赖原始card而不是safeCard
+    
+    // 重置 ScrollView 滚动位置到顶部
+    if (scrollViewRef.current && isOpen) {
+      // 使用 setTimeout 确保 ScrollView 已完全渲染
+      setTimeout(() => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo({
+            y: 0,
+            animated: false
+          })
+        }
+      }, 100)
+    }
+  }, [card, isOpen]) // 添加 isOpen 依赖，确保在打开时重置滚动位置
 
   // 检测是否需要同步相关卡片 - 只检查日期和开始时间变化
   useEffect(() => {
@@ -243,7 +257,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
           formToSave.description = []
         } else {
           formToSave.description = editForm.description
-            .split(/\\n/)
+            .split(/\n/)
             .map(s => s.trim())
             .filter(Boolean)
         }
@@ -255,7 +269,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
           formToSave.tips = []
         } else {
           formToSave.tips = editForm.tips
-            .split(/\\n/)
+            .split(/\n/)
             .map(s => s.trim())
             .filter(Boolean)
         }
@@ -410,7 +424,8 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
           </YStack>
         )}
 
-        <Sheet.ScrollView 
+        <ScrollView 
+          ref={scrollViewRef}
           flex={1}
           mb='$6'
         >
@@ -418,8 +433,8 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
             {/* 基本信息 */}
             <YStack gap="$1">
                 <XStack alignItems="center" gap="$2" mb="$2">
-                    <Info size={16} color="$color10" />
-                    <Text fontSize="$5" fontWeight="600" color="$color10">基本信息</Text>
+                    <Info size={16} color="$color11" />
+                    <Text fontSize="$5" fontWeight="600" color="$color11">基本信息</Text>
                 </XStack>
                 
                 <YStack gap="$2">
@@ -453,7 +468,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                             borderWidth={validationErrors.category ? 2 : 1}
                             iconAfter={ChevronDown}
                           >
-                            <Select.Value placeholder="选择类别" />
+                            <Select.Value fontWeight={400} placeholder="选择类别" />
                           </Select.Trigger>
                           
                           <Adapt when='maxMd' platform="touch">
@@ -486,7 +501,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                                     key={category.value} 
                                     value={category.value}
                                   >
-                                    <Select.ItemText>{category.label}</Select.ItemText>
+                                    <Select.ItemText fontWeight={400}>{category.label}</Select.ItemText>
                                     <Select.ItemIndicator marginLeft="auto">
                                       <Check size={16} />
                                     </Select.ItemIndicator>
@@ -525,7 +540,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                             disablePreventBodyScroll
                           >
                             <Select.Trigger iconAfter={ChevronDown}>
-                              <Select.Value placeholder="选择日期" />
+                              <Select.Value fontWeight={400} placeholder="选择日期" />
                             </Select.Trigger>
 
                           <Adapt when='maxMd' platform="touch">
@@ -558,7 +573,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                                       key={day.value} 
                                       value={day.value}
                                     >
-                                      <Select.ItemText>{day.label}</Select.ItemText>
+                                      <Select.ItemText fontWeight={400}>{day.label}</Select.ItemText>
                                       <Select.ItemIndicator marginLeft="auto">
                                         <Check size={16} />
                                       </Select.ItemIndicator>
@@ -573,7 +588,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                     </XStack>
 
                     <YStack gap="$1" flex={1}>
-                        <Text py='$3' fontSize="$3" color="$color10">交通方式</Text>
+                        <Text py='$3' fontWeight={500} fontSize="$3" color="$color10">交通方式</Text>
                         <Input 
                         value={form.transportation || ''} 
                         onChangeText={v => handleChange('transportation', v)}
@@ -586,13 +601,13 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
             {/* 时间安排 */}
             <YStack gap="$1">
                 <XStack alignItems="center" gap="$2" mb="$2">
-                    <Clock size={16} color="$color10" />
-                    <Text fontSize="$5" fontWeight="600" color="$color10">时间安排</Text>
+                    <Clock size={16} color="$color11" />
+                    <Text fontSize="$5" fontWeight="600" color="$color11">时间安排</Text>
                 </XStack>
                 
                 <YStack gap="$2">
                     <YStack gap="$1">
-                    <Text py='$3' fontWeight={600} fontSize="$3" color="$color11">时间段 *</Text>
+                    <Text py='$3' fontWeight={600} fontSize="$3" color="$color10">时间段 *</Text>
                     <XStack gap="$3" alignItems="center">
                         <YStack gap="$1" flex={1}>
                             <Button
@@ -605,6 +620,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                                 opacity={mode === 'createPlanB' ? 0.5 : 1}
                                 backgroundColor={mode === 'createPlanB' ? '$color3' : '$color2'}
                                 disabled={mode === 'createPlanB'}
+                                fontWeight={400}
                             >
                                 {startTime || '行程开始时间'}
                             </Button>
@@ -619,6 +635,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                                 onPress={() => setEndTimePickerOpen(true)}
                                 bg={'$color2'}
                                 color={endTime ? '$color12' : '$color10'}
+                                fontWeight={400}
                             >
                                 {endTime || '行程结束时间'}
                             </Button>
@@ -664,15 +681,15 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
             {/* 地点信息 */}
             <YStack gap="$1">
                 <XStack alignItems="center" gap="$2" mb="$2">
-                    <MapPin size={16} color="$color10" />
-                    <Text fontSize="$5" fontWeight="600" color="$color10">地点信息</Text>
+                    <MapPin size={16} color="$color11" />
+                    <Text fontSize="$5" fontWeight="600" color="$color11">地点信息</Text>
                 </XStack>
                 <YStack gap="$1">
-                    <Text py='$3' fontWeight={500} fontSize="$3" color="$color10">高德地图链接</Text>
+                    <Text py='$3' fontWeight={500} fontSize="$3" color="$color10">地图链接</Text>
                     <Input 
                     value={form.amapUrl || ''} 
                     onChangeText={v => handleChange('amapUrl', v)}
-                    placeholder="https://www.amap.com/place/..."
+                    placeholder="请将地图链接粘贴至此"
                     />
                 </YStack>
             </YStack>
@@ -680,8 +697,8 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
             {/* 详细内容 */}
             <YStack gap="$1">
             <XStack alignItems="center" gap="$2" mb="$2">
-                <Bookmark size={16} color="$color10" />
-                <Text fontSize="$5" fontWeight="600" color="$color10">详细内容</Text>
+                <Bookmark size={16} color="$color11" />
+                <Text fontSize="$5" fontWeight="600" color="$color11">详细内容</Text>
             </XStack>
             
             <YStack gap="$2">
@@ -741,7 +758,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                 </Button>
             )}
           </YStack>
-        </Sheet.ScrollView>
+        </ScrollView>
       </Sheet.Frame>
 
       {/* TimePicker组件 */}
