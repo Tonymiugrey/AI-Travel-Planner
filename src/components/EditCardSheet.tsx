@@ -306,13 +306,8 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
         }
       }}
       snapPoints={[95]}
-      dismissOnSnapToBottom
+      disableDrag
     >
-        <Sheet.Handle 
-            bg='$color4'
-            mb='$3'
-            borderRadius="$2"
-        />
       <Sheet.Overlay         
         animation="lazy"
         backgroundColor="$shadow6"
