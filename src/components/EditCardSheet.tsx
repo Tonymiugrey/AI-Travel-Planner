@@ -708,7 +708,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                     value={editForm.description || ''}
                     onChangeText={v => handleTextChange('description', v)}
                     placeholder="请输入行程描述内容（分行输入）"
-row={6}
+size={"$6"}
                 />
                 </YStack>
 
@@ -718,7 +718,7 @@ row={6}
                     value={editForm.tips || ''}
                     onChangeText={v => handleTextChange('tips', v)}
                     placeholder="请输入小贴士内容（分行输入）"
-row={6}
+
                 />
                 </YStack>
 
@@ -728,7 +728,7 @@ row={6}
                     value={form.highlights || ''}
                     onChangeText={v => handleChange('highlights', v)}
                     placeholder="请输入行程的具体信息（Markdown格式）"
-row={10}
+
                 />
                 </YStack>
             </YStack>
