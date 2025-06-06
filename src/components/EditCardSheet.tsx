@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Sheet, YStack, XStack, Input, TextArea, Button, Text, H4, Separator, Spinner, Select, Adapt, ScrollView } from 'tamagui'
+import { Sheet, YStack, XStack, Input, TextArea, Button, Text, H4, Spinner, Select, Adapt, ScrollView } from 'tamagui'
 import { TravelCardData } from '../data/travelData'
 import { TRAVEL_CATEGORIES, TRAVEL_DAYS } from '../data/travelData'
 import { X, Save, Clock, MapPin, Info, Bookmark, Trash2, AlertTriangle, ChevronDown, Check } from '@tamagui/lucide-icons' // Added AlertTriangle, ChevronDown, Check

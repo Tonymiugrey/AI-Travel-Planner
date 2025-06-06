@@ -543,6 +543,7 @@ export function HomeScreen() {
                     onPress={() => setShowDebugSettings(true)}
                     borderColor="$borderColor"
                     color="$color10"
+                    disabled
                   >
                   </Button>
                 </XStack>

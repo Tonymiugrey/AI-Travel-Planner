@@ -58,7 +58,7 @@ export const MarkdownDetailSheet: React.FC<MarkdownDetailSheetProps> = ({
         <YStack gap="$4" flex={1}>
           <H3 color="$color12" mt='$2'>{title}</H3>
           
-          <ScrollView ref={scrollViewRef} mb='$2'>
+          <Sheet.ScrollView ref={scrollViewRef} mb='$2'>
             <YStack gap="$2" p="$2">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -79,7 +79,7 @@ export const MarkdownDetailSheet: React.FC<MarkdownDetailSheetProps> = ({
                     <YStack mb="$3">
                       <Text 
                         fontSize="$6" 
-                        fontWeight="bold"
+                        fontWeight="700"
                         color="$color12"
                       >
                         {children}
@@ -90,8 +90,8 @@ export const MarkdownDetailSheet: React.FC<MarkdownDetailSheetProps> = ({
                     <YStack mb="$3">
                       <Text 
                         fontSize="$5" 
-                        fontWeight="bold"
-                        color="$color12"
+                        fontWeight="600"
+                        color="$color11"
                       >
                         {children}
                       </Text>
@@ -101,8 +101,8 @@ export const MarkdownDetailSheet: React.FC<MarkdownDetailSheetProps> = ({
                     <YStack mb="$1">
                       <Text 
                         fontSize="$4" 
-                        fontWeight="600"
-                        color="$color12"
+                        fontWeight="500"
+                        color="$color11"
                       >
                         {children}
                       </Text>
@@ -117,7 +117,7 @@ export const MarkdownDetailSheet: React.FC<MarkdownDetailSheetProps> = ({
                     <Text 
                       fontSize="$3" 
                       color="$color10" 
-                      lineHeight="$1"
+                      lineHeight="$6"
                     >
                       • {children}
                     </Text>
@@ -132,7 +132,7 @@ export const MarkdownDetailSheet: React.FC<MarkdownDetailSheetProps> = ({
                   ),
                   a: ({ children, href }) => (
                     <Text 
-                      color="$accent8"
+                      color="$accent2"
                       textDecorationLine="underline"
                       onPress={() => {
                         if (href && typeof window !== 'undefined') {
@@ -148,7 +148,7 @@ export const MarkdownDetailSheet: React.FC<MarkdownDetailSheetProps> = ({
                 {content || '暂无详细内容'}
               </ReactMarkdown>
             </YStack>
-          </ScrollView>
+          </Sheet.ScrollView>
 
           <Button
             size="$4"

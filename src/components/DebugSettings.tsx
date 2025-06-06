@@ -145,6 +145,7 @@ export const DebugSettings: React.FC<DebugSettingsProps> = ({ onBack }) => {
               disabled={isUploading || isDeleting}
               flex={1}
               theme="accent"
+              disable
             >
               {isUploading ? '上传中...' : '创建并上传数据'}
             </Button>
