@@ -380,7 +380,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
             <XStack alignItems="center" gap="$2">
               <AlertTriangle size={16} color="$red10" />
               <Text fontSize="$3" color="$red11" fontWeight="600">
-                表单错误
+                保存失败
               </Text>
             </XStack>
             
@@ -708,7 +708,6 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                     value={editForm.description || ''}
                     onChangeText={v => handleTextChange('description', v)}
                     placeholder="请输入行程描述内容（分行输入）"
-size={"$6"}
                 />
                 </YStack>
 
