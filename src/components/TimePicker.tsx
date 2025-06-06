@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { Sheet, YStack, XStack, Button, Text, View } from 'tamagui'
 import { LinearGradient } from 'tamagui/linear-gradient'
 import { Check, X } from '@tamagui/lucide-icons'
@@ -51,6 +51,9 @@ const WheelPicker: React.FC<{
   const [lastMoveY, setLastMoveY] = useState(0)
   const [isInertiaScrolling, setIsInertiaScrolling] = useState(false)
   const inertiaAnimationRef = useRef<number | null>(null)
+  const lastUpdateTimeRef = useRef(0) // 用于节流更新
+  const wheelScrollTimeoutRef = useRef<number | null>(null) // 滚轮滚动延迟
+  const accumulatedDeltaRef = useRef(0) // 累积的滚轮增量
 
   const itemHeight = height / 5 // 每个项目的高度
   const visibleItems = 5 // 可见项目数量
@@ -67,6 +70,9 @@ const WheelPicker: React.FC<{
       if (inertiaAnimationRef.current) {
         cancelAnimationFrame(inertiaAnimationRef.current)
       }
+      if (wheelScrollTimeoutRef.current) {
+        clearTimeout(wheelScrollTimeoutRef.current)
+      }
     }
   }, [])
 
@@ -79,9 +85,9 @@ const WheelPicker: React.FC<{
     }
   }, [selectedValue, items, itemHeight, centerIndex])
 
-  // 处理触摸开始
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!e.touches[0]) return
+  // 统一的指针事件处理 - 同时支持触摸和鼠标
+  const handlePointerStart = (e: React.PointerEvent) => {
+    e.preventDefault()
     
     // 停止任何正在进行的惯性滚动
     if (inertiaAnimationRef.current) {
@@ -91,21 +97,27 @@ const WheelPicker: React.FC<{
     setIsInertiaScrolling(false)
     
     setIsDragging(true)
-    setStartY(e.touches[0].clientY)
+    setStartY(e.clientY)
     setStartTranslateY(translateY)
     
     // 重置速度计算相关变量
     setVelocity(0)
     setLastMoveTime(Date.now())
-    setLastMoveY(e.touches[0].clientY)
+    setLastMoveY(e.clientY)
+    
+    // 捕获指针以确保在容器外移动时仍能收到事件
+    if (containerRef.current) {
+      containerRef.current.setPointerCapture(e.pointerId)
+    }
   }
 
-  // 处理触摸移动
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !e.touches[0]) return
+  // 统一的指针移动处理 - 优化性能
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging) return
+    e.preventDefault()
     
     const currentTime = Date.now()
-    const currentY = e.touches[0].clientY
+    const currentY = e.clientY
     const deltaY = currentY - startY
     const newTranslateY = startTranslateY + deltaY
     
@@ -120,19 +132,31 @@ const WheelPicker: React.FC<{
     
     setLastMoveTime(currentTime)
     setLastMoveY(currentY)
-    setTranslateY(newTranslateY)
+    
+    // 节流更新：每8ms（约120fps）最多更新一次，匹配120Hz显示器
+    if (currentTime - lastUpdateTimeRef.current >= 8) {
+      setTranslateY(newTranslateY)
+      lastUpdateTimeRef.current = currentTime
+    }
   }
 
-  // 处理触摸结束
-  const handleTouchEnd = () => {
+  // 统一的指针结束处理
+  const handlePointerEnd = (e: React.PointerEvent) => {
     if (!isDragging) return
+    e.preventDefault()
+    
     setIsDragging(false)
+    
+    // 释放指针捕获
+    if (containerRef.current) {
+      containerRef.current.releasePointerCapture(e.pointerId)
+    }
     
     // 安全检查：确保 items 数组存在且不为空
     if (!items || items.length === 0) return
     
     // 检查是否需要惯性滚动
-    const hasEnoughVelocity = Math.abs(velocity) > 0.5 // 最小速度阈值
+    const hasEnoughVelocity = Math.abs(velocity) > 0.3 // 降低最小速度阈值让惯性滚动更容易触发
     
     if (hasEnoughVelocity) {
       startInertiaScroll(velocity)
@@ -145,14 +169,14 @@ const WheelPicker: React.FC<{
   const startInertiaScroll = (initialVelocity: number) => {
     setIsInertiaScrolling(true)
     
-    let currentVelocity = initialVelocity * 0.6
+    let currentVelocity = initialVelocity * 0.7 // 稍微增加初始速度保持
     let currentTranslateY = translateY
     
-    const friction = 0.85
-    const minVelocity = 0.08
+    const friction = 0.85 // 增加摩擦力让减速更快
+    const minVelocity = 0.02 // 提高最小速度阈值
     
     const animate = () => {
-      // 大幅减小移动距离
+      // 减小移动距离让控制更精确
       currentTranslateY += currentVelocity * 16
       setTranslateY(currentTranslateY)
       
@@ -215,15 +239,17 @@ const WheelPicker: React.FC<{
       // 使用平滑动画移动到目标位置
       const startTranslateY = currentTranslateY
       const distance = targetTranslateY - startTranslateY
-      const duration = 250 // 250ms的吸附动画
+      const duration = 200 // 增加到400ms让动画更自然
       const startTime = Date.now()
       
       const animateSnap = () => {
         const elapsed = Date.now() - startTime
         const progress = Math.min(elapsed / duration, 1)
         
-        // 使用easeOut动画曲线让停止更自然
-        const easeProgress = 1 - Math.pow(1 - progress, 3)
+        // 使用更自然的easeOutBack动画曲线，带有轻微的弹性效果
+        const easeProgress = progress < 1 
+          ? 1 - Math.pow(1 - progress, 3) * (1 - 0.1 * Math.sin(progress * Math.PI))
+          : 1
         const animatedTranslateY = startTranslateY + distance * easeProgress
         
         setTranslateY(animatedTranslateY)
@@ -240,29 +266,148 @@ const WheelPicker: React.FC<{
     }
   }
 
-  // 处理滚轮事件
+  // 处理滚轮事件 - 改进版本，支持平滑滚动和累积滚动
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault()
     
     // 安全检查：确保 items 数组存在且不为空
     if (!items || items.length === 0) return
     
-    const delta = e.deltaY > 0 ? 1 : -1
-    const currentIndex = items.findIndex(item => item.value === selectedValue)
-    
-    // 如果当前值没找到，使用默认索引 0
-    const safeCurrentIndex = currentIndex === -1 ? 0 : currentIndex
-    const newIndex = Math.max(0, Math.min(items.length - 1, safeCurrentIndex + delta))
-    
-    // 多重安全检查：确保新索引有效且对应的项目存在且有 value 属性
-    if (newIndex >= 0 && newIndex < items.length && 
-        items[newIndex] && 
-        typeof items[newIndex].value !== 'undefined') {
-      const finalTranslateY = (centerIndex - newIndex) * itemHeight
-      setTranslateY(finalTranslateY)
-      onValueChange(items[newIndex].value)
+    // 停止任何正在进行的惯性滚动
+    if (inertiaAnimationRef.current) {
+      cancelAnimationFrame(inertiaAnimationRef.current)
+      inertiaAnimationRef.current = null
     }
+    setIsInertiaScrolling(false)
+    
+    // 累积滚轮增量，提高滚动的平滑度
+    accumulatedDeltaRef.current += e.deltaY
+    
+    // 设置滚轮灵敏度阈值（需要累积到一定量才触发一次跳转）
+    const threshold = 50 // 调整这个值来控制滚轮灵敏度
+    
+    if (Math.abs(accumulatedDeltaRef.current) >= threshold) {
+      const direction = accumulatedDeltaRef.current > 0 ? 1 : -1
+      
+      // 基于当前 translateY 计算当前索引
+      const currentIndexFloat = centerIndex - translateY / itemHeight
+      const currentIndex = Math.round(currentIndexFloat)
+      const safeCurrentIndex = Math.max(0, Math.min(items.length - 1, currentIndex))
+      
+      // 计算新索引
+      const newIndex = Math.max(0, Math.min(items.length - 1, safeCurrentIndex + direction))
+      
+      // 只有当索引真的改变时才执行动画
+      if (newIndex !== safeCurrentIndex && newIndex >= 0 && newIndex < items.length && 
+          items[newIndex] && typeof items[newIndex].value !== 'undefined') {
+        
+        const targetTranslateY = (centerIndex - newIndex) * itemHeight
+        
+        // 使用平滑动画过渡到新位置
+        const startTranslateY = translateY
+        const distance = targetTranslateY - startTranslateY
+        const duration = 300 // 滚轮动画持续时间
+        const startTime = Date.now()
+        
+        const animateWheel = () => {
+          const elapsed = Date.now() - startTime
+          const progress = Math.min(elapsed / duration, 1)
+          
+          // 使用缓动函数让动画更自然
+          const easeProgress = 1 - Math.pow(1 - progress, 3) // easeOutCubic
+          const animatedTranslateY = startTranslateY + distance * easeProgress
+          
+          setTranslateY(animatedTranslateY)
+          
+          if (progress < 1) {
+            requestAnimationFrame(animateWheel)
+          } else {
+            // 动画完成，更新选中值
+            onValueChange(items[newIndex].value)
+          }
+        }
+        
+        animateWheel()
+        
+        // 重置累积增量
+        accumulatedDeltaRef.current = 0
+      }
+    }
+    
+    // 清除之前的延迟定时器
+    if (wheelScrollTimeoutRef.current) {
+      clearTimeout(wheelScrollTimeoutRef.current)
+    }
+    
+    // 设置一个短暂的延迟来重置累积增量，避免长时间累积
+    wheelScrollTimeoutRef.current = window.setTimeout(() => {
+      accumulatedDeltaRef.current = 0
+    }, 500)
   }
+
+  // 使用 useMemo 缓存样式计算结果 - 优化版本
+  const itemStyles = useMemo(() => {
+    return items.map((item, index) => {
+      // 计算当前项目在视觉上的位置
+      const itemY = index * itemHeight + translateY
+      const centerY = centerIndex * itemHeight
+      
+      // 计算距离中心位置的距离（像素）
+      const distanceFromCenter = Math.abs(itemY - centerY)
+      
+      // 基于距离计算相对位置（0 = 在中心，1+ = 远离中心）
+      const relativeDistance = distanceFromCenter / itemHeight
+      
+      // 使用更简单的插值函数减少计算量
+      const smoothDistance = Math.min(relativeDistance, 2.5) // 稍微增加可见范围
+      
+      // 简化计算：使用线性插值而不是复杂的指数函数
+      const distanceRatio = smoothDistance / 2.5
+      
+      // 计算透明度：线性过渡
+      const opacity = Math.max(0.2, 1 - distanceRatio * 0.8)
+      
+      // 计算缩放：线性过渡
+      const scale = Math.max(0.7, 1 - distanceRatio * 0.3)
+      
+      // 计算字体大小：线性过渡
+      const fontSize = Math.max(14, 24 - distanceRatio * 10)
+      
+      // 简化字体粗细计算
+      let fontWeight: string
+      if (smoothDistance < 0.5) {
+        fontWeight = '700'
+      } else if (smoothDistance < 1.0) {
+        fontWeight = '600'
+      } else if (smoothDistance < 1.5) {
+        fontWeight = '500'
+      } else {
+        fontWeight = '400'
+      }
+      
+      // 简化颜色计算
+      let color: string
+      if (smoothDistance < 0.5) {
+        color = '$color12'
+      } else if (smoothDistance < 1.0) {
+        color = '$color11'
+      } else if (smoothDistance < 1.5) {
+        color = '$color10'
+      } else {
+        color = '$color9'
+      }
+      
+      return {
+        opacity,
+        scale,
+        fontSize,
+        fontWeight,
+        color,
+        // 预计算可见性，避免渲染屏幕外的元素
+        isVisible: smoothDistance < 2.5
+      }
+    })
+  }, [items, translateY, itemHeight, centerIndex])
 
   return (
     <View
@@ -271,11 +416,15 @@ const WheelPicker: React.FC<{
       width={60}
       position="relative"
       overflow="hidden"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onPointerDown={handlePointerStart}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
       onWheel={handleWheel}
-      style={{ userSelect: 'none' }}
+      style={{ 
+        userSelect: 'none',
+        touchAction: 'none' // 防止浏览器默认的触摸行为
+      }}
     >
       {/* 选中项覆盖层 */}
       <View
@@ -312,56 +461,15 @@ const WheelPicker: React.FC<{
         width="100%"
         style={{
           transform: `translateY(${translateY}px)`,
-          transition: (isDragging || isInertiaScrolling) ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          transition: (isDragging || isInertiaScrolling) ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.8, 0.25, 1)'
         }}
       >
         {items.map((item, index) => {
-          // 计算当前项目在视觉上的位置
-          const itemY = index * itemHeight + translateY
-          const centerY = centerIndex * itemHeight
+          const { opacity, scale, fontSize, fontWeight, color, isVisible } = itemStyles[index]
           
-          // 计算距离中心位置的距离（像素）
-          const distanceFromCenter = Math.abs(itemY - centerY)
-          
-          // 基于距离计算相对位置（0 = 在中心，1+ = 远离中心）
-          const relativeDistance = distanceFromCenter / itemHeight
-          
-          // 使用更平滑的插值函数
-          const smoothDistance = Math.min(relativeDistance, 2) // 限制最大距离为2个单位
-          
-          // 计算透明度：使用平滑曲线，中心为1，远离中心逐渐减小
-          const opacity = Math.max(0.3, Math.min(1, 1 - Math.pow(smoothDistance / 2, 0.8)))
-          
-          // 计算缩放：使用平滑的二次函数，让过渡更自然
-          const scaleBase = Math.max(0, 1 - smoothDistance / 2)
-          const scale = Math.max(0.75, Math.min(1, 0.75 + 0.25 * Math.pow(scaleBase, 0.6)))
-          
-          // 计算字体大小：使用平滑过渡，中心最大，远离中心逐渐减小
-          const fontSizeBase = Math.max(0, 1 - smoothDistance / 2)
-          const fontSize = Math.max(16, Math.min(24, 16 + 8 * Math.pow(fontSizeBase, 0.5)))
-          
-          // 计算字体粗细：基于距离的平滑过渡
-          let fontWeight: string
-          if (smoothDistance < 0.3) {
-            fontWeight = '700'
-          } else if (smoothDistance < 0.7) {
-            fontWeight = '600'
-          } else if (smoothDistance < 1.2) {
-            fontWeight = '500'
-          } else {
-            fontWeight = '400'
-          }
-          
-          // 计算颜色：使用平滑的颜色过渡
-          let color: string
-          if (smoothDistance < 0.3) {
-            color = '$color12'
-          } else if (smoothDistance < 0.7) {
-            color = '$color11'
-          } else if (smoothDistance < 1.2) {
-            color = '$color10'
-          } else {
-            color = '$color8'
+          // 跳过不可见的元素以提高性能
+          if (!isVisible) {
+            return <View key={item.value} height={itemHeight} width="100%" />
           }
           
           return (
@@ -374,7 +482,7 @@ const WheelPicker: React.FC<{
               style={{
                 opacity,
                 transform: `scale(${scale})`,
-                transition: (isDragging || isInertiaScrolling) ? 'transform 100ms ease-out, font-size 100ms ease-out' : 'all 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                transition: (isDragging || isInertiaScrolling) ? 'none' : 'all 300ms cubic-bezier(0.25, 0.8, 0.25, 1)'
               }}
             >
               <Text
@@ -382,7 +490,7 @@ const WheelPicker: React.FC<{
                 fontWeight={fontWeight}
                 color={color}
                 style={{
-                  transition: (isDragging || isInertiaScrolling) ? 'font-size 100ms ease-out, color 100ms ease-out' : 'all 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  transition: (isDragging || isInertiaScrolling) ? 'none' : 'all 300ms cubic-bezier(0.25, 0.8, 0.25, 1)',
                   textAlign: 'center',
                   width: '100%'
                 }}

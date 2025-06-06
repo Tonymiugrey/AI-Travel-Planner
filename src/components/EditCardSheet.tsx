@@ -24,7 +24,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
   onSave,
   onDelete,
 }) => {
-  const { updateCardWithSync } = useData()
+  const { updateCardWithSync, travelCards } = useData()
   const { theme } = useTheme()
   const scrollViewRef = useRef<any>(null)
   
@@ -120,10 +120,25 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
 
   // 检测是否需要同步相关卡片 - 只检查日期和开始时间变化
   useEffect(() => {
-    if (!card) return
+    if (!card || !travelCards) return
     
-    // 检查是否为planB或有planB的planA
-    const hasRelatedCard = card.isPlanB || (card && !card.isPlanB && card.id)
+    // 只有在编辑模式且有真实卡片ID时才检查同步
+    if (mode === 'create') return
+    
+    // 检查是否真的有关联卡片
+    let hasRelatedCard = false
+    
+    if (card.isPlanB) {
+      // 如果是Plan B，检查是否有对应的Plan A
+      hasRelatedCard = travelCards.some(c => 
+        c.id === card.planAId && !c.isPlanB
+      )
+    } else {
+      // 如果是Plan A，检查是否有对应的Plan B
+      hasRelatedCard = travelCards.some(c => 
+        c.isPlanB && c.planAId === card.id
+      )
+    }
     
     if (hasRelatedCard) {
       const dayChanged = form.day !== originalDay
@@ -135,8 +150,10 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
       } else {
         setNeedsSync(false)
       }
+    } else {
+      setNeedsSync(false)
     }
-  }, [form.day, form.time, originalDay, originalStartTime, card])
+  }, [form.day, form.time, originalDay, originalStartTime, card, mode, travelCards])
 
   // 通用输入处理
   const handleChange = (key: keyof TravelCardData, value: any) => {
@@ -275,8 +292,8 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
         }
       }
       
-      // 检查是否需要同步相关卡片
-      if (needsSync && (card?.isPlanB || (card && !card.isPlanB))) {
+      // 检查是否需要同步相关卡片（只在编辑模式下）
+      if (mode === 'edit' && needsSync && (card?.isPlanB || (card && !card.isPlanB))) {
         // 使用带同步的更新方法
         const result = await updateCardWithSync(formToSave, true)
         
@@ -290,7 +307,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
           await onSave(formToSave, true)
         }
       } else if (onSave) {
-        // 使用传统的保存方法
+        // 使用传统的保存方法（新建、createPlanB或编辑但不需要同步）
         await onSave(formToSave, false)
       }
       
@@ -708,8 +725,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                     value={editForm.description || ''}
                     onChangeText={v => handleTextChange('description', v)}
                     placeholder="请输入行程描述内容（分行输入）"
-    numberOfLines={10}
-    multiline={true}
+                    numberOfLines={8}
                 />
                 </YStack>
 
@@ -719,8 +735,8 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                     value={editForm.tips || ''}
                     onChangeText={v => handleTextChange('tips', v)}
                     placeholder="请输入小贴士内容（分行输入）"
-    numberOfLines={10}
-    multiline={true}
+                    rows={8}
+                    
                 />
                 </YStack>
 
@@ -730,8 +746,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                     value={form.highlights || ''}
                     onChangeText={v => handleChange('highlights', v)}
                     placeholder="请输入行程的具体信息（Markdown格式）"
-    numberOfLines={10}
-    multiline={true}
+                    rows={16}
                 />
                 </YStack>
             </YStack>
