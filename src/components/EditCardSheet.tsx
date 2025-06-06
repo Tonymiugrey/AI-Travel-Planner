@@ -708,8 +708,7 @@ export const EditCardSheet: React.FC<EditCardSheetProps> = ({
                     value={editForm.description || ''}
                     onChangeText={v => handleTextChange('description', v)}
                     placeholder="请输入行程描述内容（分行输入）"
-minHeight={120}
-    numberOfLines={6}
+    numberOfLines={10}
     multiline={true}
                 />
                 </YStack>
@@ -720,8 +719,7 @@ minHeight={120}
                     value={editForm.tips || ''}
                     onChangeText={v => handleTextChange('tips', v)}
                     placeholder="请输入小贴士内容（分行输入）"
-minHeight={120}
-    numberOfLines={6}
+    numberOfLines={10}
     multiline={true}
                 />
                 </YStack>
@@ -732,8 +730,7 @@ minHeight={120}
                     value={form.highlights || ''}
                     onChangeText={v => handleChange('highlights', v)}
                     placeholder="请输入行程的具体信息（Markdown格式）"
-minHeight={120}
-    numberOfLines={6}
+    numberOfLines={10}
     multiline={true}
                 />
                 </YStack>
